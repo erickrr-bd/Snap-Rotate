@@ -1,6 +1,13 @@
+from os import path
 from sys import exit
 from dialog import Dialog
+from modules.UtilsClass import Utils
+from modules.ConfigurationClass import Configuration
 
+"""
+Class that allows managing all the graphical interfaces
+of the application.
+"""
 class FormDialog:
 	"""
 	Property that stores an object of type Dialog.
@@ -14,7 +21,7 @@ class FormDialog:
 	self -- An instantiated object of the FormDialogs class.
 	"""
 	def __init__(self):
-		#self.utils = Utils(self)
+		self.utils = Utils(self)
 		self.d = Dialog(dialog = "dialog")
 		self.d.set_background_title("SNAP-ROTATE-TOOL")
 
@@ -35,6 +42,35 @@ class FormDialog:
 			return tag_mm
 		if code_mm == self.d.CANCEL:
 			exit(0)
+
+	"""
+	Method that generates an interface with several
+	available options, and where only one of them can be
+	chosen.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	text -- Text displayed on the interface.
+	options -- List of options that make up the interface.
+	title -- Title displayed on the interface.
+
+	Return:
+	tag_rl -- Chosen option.
+	"""
+	def getDataRadioList(self, text, options, title):
+		while True:
+			code_rl, tag_rl = self.d.radiolist(
+					  text,
+					  width = 65,
+					  choices = options,
+					  title = title)
+			if code_rl == self.d.OK:
+				if len(tag_rl) == 0:
+					self.d.msgbox("\nSelect at least one option.", 7, 50, title = "Error Message")
+				else:
+					return tag_rl
+			if code_rl == self.d.CANCEL:
+				self.mainMenu()
 
 	"""
 	Method that launches an action based on the option
@@ -62,6 +98,8 @@ class FormDialog:
 	self -- An instantiated object of the FormDialogs class.
 	"""
 	def defineConfiguration(self):
+		configuration = Configuration()
+
 		options_conf_false = [("Create", "Create the configuration file", 0)]
 
 		options_conf_true = [("Modify", "Modify the configuration file", 0)]
@@ -76,7 +114,7 @@ class FormDialog:
 				if opt_conf_true == "Modify":
 					self.configuration.updateConfiguration()
 		except TypeError as exception:
-			#self.utils.createInvAlertToolLog(exception, 4)
+			self.utils.createSnapToolLog(exception, 3)
 			self.d.msgbox("\nAn error has occurred. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.mainMenu()
 
