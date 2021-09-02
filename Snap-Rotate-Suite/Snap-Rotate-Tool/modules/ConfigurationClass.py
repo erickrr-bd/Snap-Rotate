@@ -85,7 +85,7 @@ class Configuration:
 		print(data_conf)
 
 
-		"""
+	"""
 	Method that creates the YAML file where the configuration
 	is stored.
 
@@ -113,10 +113,12 @@ class Configuration:
 
 		if data_conf[last_index + 1] == True:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1], 'http_auth_user' : data_conf[last_index + 2], 'http_auth_pass' : data_conf[last_index + 3] }
+			last_index += 3
 		else:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
+			last_index += 1
 		data_json.update(http_auth_json)
+		aux_json = { 'repo_path' : data_conf[last_index + 1], 'frequency_rotation' : data_conf[last_index + 2], 'time_execution' : data_conf[last_index + 3] } 
+		data_json.update(aux_json)
 
-		inv_folder = self.utils.getPathInvAlert(data_conf[3])
-		self.utils.createNewFolder(inv_folder)
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')
