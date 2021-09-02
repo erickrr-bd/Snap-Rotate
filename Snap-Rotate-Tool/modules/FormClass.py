@@ -37,6 +37,50 @@ class FormDialog:
 			exit(0)
 
 	"""
+	Method that launches an action based on the option
+	chosen in the main menu.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	option -- Chosen option.
+	"""
+	def switchMmenu(self, option):
+		if option == 1:
+			self.defineConfiguration()
+		if option == 2:
+			self.serviceMenu()
+		if option == 3:
+			self.getAbout()
+		if option == 4:
+			exit(0)
+
+	"""
+	Method that defines the action to be performed on the
+	Snap-Rotate configuration file (creation or modification).
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	"""
+	def defineConfiguration(self):
+		options_conf_false = [("Create", "Create the configuration file", 0)]
+
+		options_conf_true = [("Modify", "Modify the configuration file", 0)]
+		
+		try:
+			if not path.exists(self.configuration.conf_file):
+				opt_conf_false = self.getDataRadioList("Select a option:", options_conf_false, "Configuration Options")
+				if opt_conf_false == "Create":
+					self.configuration.createConfiguration()
+			else:
+				opt_conf_true = self.getDataRadioList("Select a option:", options_conf_true, "Configuration Options")
+				if opt_conf_true == "Modify":
+					self.configuration.updateConfiguration()
+		except TypeError as exception:
+			#self.utils.createInvAlertToolLog(exception, 4)
+			self.d.msgbox("\nAn error has occurred. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.mainMenu()
+
+	"""
 	Method that defines the menu on the actions to be
 	carried out in the main menu.
 
