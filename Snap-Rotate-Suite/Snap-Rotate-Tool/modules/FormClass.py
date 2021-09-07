@@ -77,6 +77,34 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
+	Method that generates an interface with several
+	available options, and where you can choose one or more
+	of them.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	text -- Text displayed on the interface.
+	options -- List of options that make up the interface.
+	title -- Title displayed on the interface.
+
+	Return:
+	tag_checklist -- List with the chosen options.
+	"""
+	def getDataCheckList(self, text, options, title):
+		while True:
+			code_checklist, tag_checklist = self.d.checklist(text = text,
+					 										 width = 75,
+					 										 choices = options,
+					 										 title = title)
+			if code_checklist == self.d.OK:
+				if len(tag_checklist) == 0:
+					self.d.msgbox("\nSelect at least one option.", 7, 50, title = "Error Message")
+				else:
+					return tag_checklist
+			elif code_checklist == self.d.CANCEL:
+				self.mainMenu()
+
+	"""
 	Method that generates the interface for entering decimal
 	or floating type data.
 

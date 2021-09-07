@@ -118,23 +118,87 @@ class Elastic:
 			return conn_es
 
 	"""
-	"""
-	def getIndicesElastic(self, conn_es):
-		list_all_index = []
-		list_all_index = conn_es.indices.get('winlogbeat-*')
-		return list_all_index
+	Method that obtains all the names of the indices that
+	comply with an index pattern.
 
-	def getInfoIndexElastic(self, conn_es, index_name):
-		info = conn_es.indices.get(index_name)
-		print(info[index_name]['aliases'])
-		aux = info[index_name]['aliases']
-		for i in aux:
-			p = i
-		print(info[index_name]['aliases'][p]['is_write_index'])
-		epoch_time = info[index_name]['settings']['index']['creation_date']
-		print(epoch_time)
-		t = datetime.fromtimestamp(int(epoch_time) / 1000)
-		print(t)
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to
+			   ElasticSearch.
+	index_pattern -- ElasticSearch index pattern.
+
+	Return:
+	list_all_index -- List with the names of the indices
+					  found.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404
+								status code.
+	exceptions.AuthorizationException -- Exception representing
+										 a 403 status code.
+	"""
+	def getIndicesElastic(self, conn_es, index_pattern):
+		try:
+			list_all_index = []
+			list_all_index = conn_es.indices.get(index_pattern)
+		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nError getting the indices. For more information, see the logs.")
+		else:
+			return list_all_index
+
+	"""
+	Method that gets if an index is writeable or not.
+	
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to
+			   ElasticSearch.
+	index_name -- ElasticSearch index name.
+
+	Return:
+	is_writeable_index -- Whether the index is writeable or
+						  not.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404
+								status code.
+	exceptions.AuthorizationException -- Exception representing
+										 a 403 status code.
+	"""
+	def getIsWriteableIndex(self, conn_es, index_name):
+		try:
+			info = conn_es.indices.get(index_name)
+			aux_var = info[index_name]['aliases']
+			for aux in aux_var:
+				is_writeable_index = info[index_name]['aliases'][aux]['is_write_index']
+		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nError getting index information. For more information, see the logs.")
+		else:
+			return is_writeable_index
+
+	"""
+	Method that removes an index.
+
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to
+			   ElasticSearch.
+	index_name -- ElasticSearch index name.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404
+								status code.
+	exceptions.AuthorizationException -- Exception representing
+										 a 403 status code.
+	"""
+	def deleteIndex(self, conn_es, index_name):
+		try:
+			conn_es.indices.delete(index = index_name)
+		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nFailed to delete index. For more information, see the logs.")
 
 	"""
 	Method that creates the repository for snapshots.
@@ -158,4 +222,61 @@ class Elastic:
 			print("\nError creating repository. For more information, see the logs.")
 			exit(1)
 
+	"""
+	Method that creates a snapshot.
 
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to
+			   ElasticSearch.
+	repository_name -- Name of the repository.
+	snapshot_name --  Name of the snapshot.
+	indices -- List with the names of the indices that will}
+	 		   be saved in the snapshot.
+
+	Exceptions:
+	exceptions.RequestError -- Exception representing a 400
+							   status code.
+	exceptions.NotFoundError -- Exception representing a 404
+								status code.
+	exceptions.AuthorizationException -- Exception representing
+										 a 403 status code.
+	"""
+	def createSnapshot(self, conn_es, repository_name, snapshot_name, indices):
+		try:
+			conn_es.snapshot.create(repository = repository_name,
+									snapshot = snapshot_name,
+									body = { "indices" : indices, "include_global_state" : False },
+									wait_for_completion = False)
+		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException) as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nFailed to create snapshot. For more information, see the logs.")
+			exit(1)
+
+	"""
+	Method that obtains the current status of a snapshot.
+
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to
+			   ElasticSearch.
+	repository_name -- Name of the repository.
+	snapshot_name --  Name of the snapshot.
+
+	Return:
+	status_snapshot -- Snapshot status.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404
+								status code.
+	"""
+	def getStatusSnapshot(self, conn_es, repository_name, snapshot_name):
+		try:
+			info_snapshot = conn_es.snapshot.status(repository = repository_name,
+													snapshot = snapshot_name)
+			status_snapshot = info_snapshot['snapshots'][0]['state']
+		except (exceptions.NotFoundError) as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nFailed to create snapshot. For more information, see the logs.")
+		else:
+			return status_snapshot

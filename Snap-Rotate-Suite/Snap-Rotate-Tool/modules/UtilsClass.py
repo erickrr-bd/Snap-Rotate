@@ -93,6 +93,33 @@ class Utils:
 			self.form_dialog.mainMenu()
 
 	"""
+	Method that obtains and stores the content of a YAML file
+	in a variable.
+
+	Parameters:
+	self -- An instantiated object of the Utils class.
+	path_file_yaml -- YAML file path.
+	mode -- Mode in which the YAML file will be opened.
+
+	Return:
+	data_file_yaml -- Variable that stores the content of the
+					  YAML file.
+
+	Exceptions:
+	IOError -- It is an error raised when an input/output
+	           operation fails.
+	"""
+	def readYamlFile(self, path_file_yaml, mode):
+		try:
+			with open(path_file_yaml, mode) as file_yaml:
+				data_file_yaml = safe_load(file_yaml)
+		except IOError as exception:
+			self.createSnapRotateToolLog(exception, 3)
+			print("\nError opening or reading the YAML file. For more information, see the logs.")
+		else:
+			return data_file_yaml
+
+	"""
 	Method that obtains the passphrase used for the process of
 	encrypting and decrypting a file.
 
@@ -161,6 +188,34 @@ class Utils:
 		if(not regular_expression.match(data_entered)):
 			return False
 		return True
+
+	"""
+	Method that obtains the hash of a file.
+
+	Parameters:
+	self -- An instantiated object of the Utils class.
+	path_file -- Path of the file from which the hash function will
+	        be obtained.
+
+	Return:
+	Hash of the file.
+
+	Exceptions:
+	IOError -- It is an error raised when an input/output
+	           operation fails.
+	"""
+	def getHashToFile(self, path_file):
+		try:
+			hash_sha = sha256()
+			with open(path_file, 'rb') as file_to_hash:
+				for block in iter(lambda: file_to_hash.read(4096), b""):
+					hash_sha.update(block)
+		except IOError as exception:
+			self.createSnapRotateToolLog(exception, 3)
+			self.form_dialog.d.msgbox("\nError getting the file's hash function. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.mainMenu()
+		else:
+			return hash_sha.hexdigest()
 
 	"""
 	Method that encrypts a text string.
