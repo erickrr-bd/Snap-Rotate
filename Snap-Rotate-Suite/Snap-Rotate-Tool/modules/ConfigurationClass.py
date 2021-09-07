@@ -1,3 +1,4 @@
+from os import path
 from datetime import datetime
 from modules.UtilsClass import Utils
 
@@ -25,8 +26,7 @@ class Configuration:
 	Property that stores the options for how often the
 	inventory will be fetched.
 	"""
-	options_frequency_rotation = [["Weekly", "Weekly rotation", 0],
-								  ["Monthly", "Monthly rotation", 0]]
+	options_frequency_rotation = [["Monthly", "Monthly rotation", 0]]
 
 	"""
 	Constructor for the Configuration class.
@@ -55,13 +55,13 @@ class Configuration:
 		data_conf.append(version_es)
 		data_conf.append(host_es)
 		data_conf.append(port_es)
-		use_ssl = self.form_dialog.getDataYesOrNo("\nDo you want Inv-Alert to connect to ElasticSearch using the SSL/TLS protocol?", "Connection Via SSL/TLS")
+		use_ssl = self.form_dialog.getDataYesOrNo("\nDo you want Snap-Rotate to connect to ElasticSearch using the SSL/TLS protocol?", "Connection Via SSL/TLS")
 		if use_ssl == "ok":
 			data_conf.append(True)
 			valid_certificate = self.form_dialog.getDataYesOrNo("\nDo you want the certificate for SSL/TLS communication to be validated?", "Certificate Validation")
 			if valid_certificate == "ok":
 				data_conf.append(True)
-				cert_file = self.form_dialog.getFile('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
+				cert_file = self.form_dialog.getFile("/etc/Snap-Rotate-Suite/Snap-Rotate", "Select the CA certificate:")
 				data_conf.append(cert_file)
 			else:
 				data_conf.append(False)
@@ -78,12 +78,20 @@ class Configuration:
 			data_conf.append(False)
 		repo_path = self.form_dialog.getDirectory("/etc/Snap-Rotate-Suite", "Repositories Path")
 		frequency_rotation = self.form_dialog.getDataRadioList("Select a option:", self.options_frequency_rotation, "Repository Rotation Frequency")
-		time_daily_execution = self.form_dialog.getDataTime("Choose the daily time to validate:", now.hour, now.minute)
 		data_conf.append(repo_path)
 		data_conf.append(frequency_rotation)
-		data_conf.append(str(time_daily_execution[0]) + ':' + str(time_daily_execution[1]))
-		print(data_conf)
-
+		if frequency_rotation == "Monthly":
+			date_rotate = self.form_dialog.getRangeBox("Choose the number of the month in which the snapshots will be made:", 1, 31, 1, "Day Of The Month")
+			time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:")
+			data_conf.append(date_rotate)
+			data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))
+		self.createFileConfiguration(data_conf)
+		if path.exists(self.conf_file):
+			self.utils.createSnapRotateToolLog("Configuration file created", 1)
+			self.form_dialog.d.msgbox("\nConfiguration file created.", 7, 50, title = "Notification Message")
+		else:
+			self.form_dialog.d.msgbox("\nError creating configuration file. For more information, see the logs.", 8, 50, title = "Error Message")
+		self.form_dialog.mainMenu()
 
 	"""
 	Method that creates the YAML file where the configuration
@@ -118,7 +126,7 @@ class Configuration:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
 			last_index += 1
 		data_json.update(http_auth_json)
-		aux_json = { 'repo_path' : data_conf[last_index + 1], 'frequency_rotation' : data_conf[last_index + 2], 'time_execution' : data_conf[last_index + 3] } 
+		aux_json = { 'repo_path' : data_conf[last_index + 1], 'frequency_rotation' : data_conf[last_index + 2], 'date_rotate' : int(data_conf[last_index + 3]), 'time_rotate' : data_conf[last_index + 4] } 
 		data_json.update(aux_json)
 
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')

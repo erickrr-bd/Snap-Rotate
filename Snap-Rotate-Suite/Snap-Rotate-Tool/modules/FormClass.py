@@ -32,17 +32,20 @@ class FormDialog:
 
 	Parameters:
 	self -- An instantiated object of the FormDialogs class.
+	text -- Text displayed on the interface.
 	options -- List of options that make up the menu.
 	title -- Title displayed on the interface.
 
 	Return:
-	tag_mm -- Chosen option.
+	tag_menu -- Chosen option.
 	"""
-	def getMenu(self, options, title):
-		code_mm, tag_mm = self.d.menu("Choose an option:", choices = options, title = title)
-		if code_mm == self.d.OK:
-			return tag_mm
-		if code_mm == self.d.CANCEL:
+	def getMenu(self, text, options, title):
+		code_menu, tag_menu = self.d.menu(text = text,
+										  choices = options,
+										  title = title)
+		if code_menu == self.d.OK:
+			return tag_menu
+		if code_menu == self.d.CANCEL:
 			exit(0)
 
 	"""
@@ -57,21 +60,20 @@ class FormDialog:
 	title -- Title displayed on the interface.
 
 	Return:
-	tag_rl -- Chosen option.
+	tag_radiolist -- Chosen option.
 	"""
 	def getDataRadioList(self, text, options, title):
 		while True:
-			code_rl, tag_rl = self.d.radiolist(
-					  text,
-					  width = 65,
-					  choices = options,
-					  title = title)
-			if code_rl == self.d.OK:
-				if len(tag_rl) == 0:
+			code_radiolist, tag_radiolist = self.d.radiolist(text = text,
+					  										 width = 65,
+					  										 choices = options,
+					  										 title = title)
+			if code_radiolist == self.d.OK:
+				if len(tag_radiolist) == 0:
 					self.d.msgbox("\nSelect at least one option.", 7, 50, title = "Error Message")
 				else:
-					return tag_rl
-			if code_rl == self.d.CANCEL:
+					return tag_radiolist
+			elif code_radiolist == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
@@ -84,18 +86,21 @@ class FormDialog:
 	initial_value -- Default value shown on the interface.
 
 	Return:
-	tag_nd -- Decimal or float value entered.
+	tag_inputbox -- Decimal or float value entered.
 	"""
 	def getDataNumberDecimal(self, text, initial_value):
 		decimal_reg_exp = re_compile(r'^[1-9](\.[0-9]+)?$')
 		while True:
-			code_nd, tag_nd = self.d.inputbox(text, 10, 50, initial_value)
-			if code_nd == self.d.OK:
-				if(not self.utils.validateRegularExpression(decimal_reg_exp, tag_nd)):
+			code_inputbox, tag_inputbox = self.d.inputbox(text = text,
+											  			  height = 10,
+											  			  width = 50,
+											  			  init = initial_value)
+			if code_inputbox == self.d.OK:
+				if(not self.utils.validateRegularExpression(decimal_reg_exp, tag_inputbox)):
 					self.d.msgbox("\nInvalid data entered. Required value (decimal or float).", 8, 50, title = "Error Message")
 				else:
-					return tag_nd
-			if code_nd == self.d.CANCEL:
+					return tag_inputbox
+			elif code_inputbox == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
@@ -108,18 +113,21 @@ class FormDialog:
 	initial_value -- Default value shown on the interface.
 
 	Return:
-	tag_ip -- IP address entered.
+	tag_inputbox -- IP address entered.
 	"""
 	def getDataIP(self, text, initial_value):
 		ip_reg_exp = re_compile(r'^(?:(?:[1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^localhost$')
 		while True:
-			code_ip, tag_ip = self.d.inputbox(text, 10, 50, initial_value)
-			if code_ip == self.d.OK:
-				if(not self.utils.validateRegularExpression(ip_reg_exp, tag_ip)):
+			code_inputbox, tag_inputbox = self.d.inputbox(text = text,
+														  height = 10,
+														  width = 50,
+														  init = initial_value)
+			if code_inputbox == self.d.OK:
+				if(not self.utils.validateRegularExpression(ip_reg_exp, tag_inputbox)):
 					self.d.msgbox("\nInvalid data entered. Required value (IP address).", 8, 50, title = "Error Message")
 				else:
-					return tag_ip
-			if code_ip == self.d.CANCEL:
+					return tag_inputbox
+			elif code_inputbox == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
@@ -131,18 +139,21 @@ class FormDialog:
 	initial_value -- Default value shown on the interface.
 
 	Return:
-	tag_port -- Port entered.
+	tag_inputbox -- Port entered.
 	"""
 	def getDataPort(self, text, initial_value):
 		port_reg_exp = re_compile(r'^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$')
 		while True:
-			code_port, tag_port = self.d.inputbox(text, 10, 50, initial_value)
-			if code_port == self.d.OK:
-				if(not self.utils.validateRegularExpression(port_reg_exp, tag_port)):
+			code_inputbox, tag_inputbox = self.d.inputbox(text = text,
+														  height = 10,
+														  width = 50,
+														  init = initial_value)
+			if code_inputbox == self.d.OK:
+				if(not self.utils.validateRegularExpression(port_reg_exp, tag_inputbox)):
 					self.d.msgbox("\nInvalid data entered. Required value (0 - 65535).", 8, 50, title = "Error Message")
 				else:
-					return tag_port
-			if code_port == self.d.CANCEL:
+					return tag_inputbox
+			elif code_inputbox == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
@@ -154,17 +165,20 @@ class FormDialog:
 	initial_value -- Default value shown on the interface.
 
 	Return:
-	tag_input -- Text entered.
+	tag_inputbox -- Text entered.
 	"""
 	def getDataInputText(self, text, initial_value):
 		while True:
-			code_input, tag_input = self.d.inputbox(text, 10, 50, initial_value)
-			if code_input == self.d.OK:
-				if tag_input == "":
+			code_inputbox, tag_inputbox = self.d.inputbox(text = text,
+														  height = 10,
+														  width = 50,
+														  init = initial_value)
+			if code_inputbox == self.d.OK:
+				if tag_inputbox == "":
 					self.d.msgbox("\nInvalid data entered. Required value (not empty).", 8, 50, title = "Error Message")
 				else:
-					return tag_input
-			if code_input == self.d.CANCEL:
+					return tag_inputbox
+			elif code_inputbox == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
@@ -176,17 +190,21 @@ class FormDialog:
 	initial_value -- Default value shown on the interface.
 
 	Return:
-	tag_pass -- Password entered.
+	tag_passwordbox -- Password entered.
 	"""
 	def getDataPassword(self, text, initial_value):
 		while True:
-			code_pass, tag_pass = self.d.passwordbox(text, 10, 50, initial_value, insecure = True)
-			if code_pass == self.d.OK:
-				if tag_pass == "":
+			code_passwordbox, tag_passwordbox = self.d.passwordbox(text = text,
+																   height = 10,
+																   width = 50,
+																   init = initial_value,
+																   insecure = True)
+			if code_passwordbox == self.d.OK:
+				if tag_passwordbox == "":
 					self.d.msgbox("\nInvalid data entered. Required value (not empty).", 8, 50, title = "Error Message")
 				else:
-					return tag_pass
-			if code_pass == self.d.CANCEL:
+					return tag_passwordbox
+			elif code_passwordbox == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
@@ -199,51 +217,97 @@ class FormDialog:
 	title -- Title displayed on the interface.
 
 	Return:
-	tag_yesorno -- Chosen option (yes or no).
+	tag_yesno -- Chosen option (yes or no).
 	"""
 	def getDataYesOrNo(self, text, title):
-		tag_yesorno = self.d.yesno(text, 10, 50, title = title)
-		return tag_yesorno
+		tag_yesno = self.d.yesno(text = text,
+								 height = 10,
+								 width = 50,
+								 title = title)
+		return tag_yesno
 
 	"""
 	Method that generates an interface to select a file.
 
 	Parameters:
 	self -- An instantiated object of the FormDialogs class.
-	initial_path -- Directory or initial path.
+	initial_path -- Initial path in the interface.
 	title -- Title displayed on the interface.
 
 	Return:
-	tag_df -- Path of the selected file.
+	tag_fselect -- Path of the selected file.
 	"""
 	def getFile(self, initial_path, title):
 		while True:
-			code_fd, tag_df = self.d.fselect(initial_path, 8, 50, title = title)
-			if code_fd == self.d.OK:
-				if tag_df == "":
+			code_fselect, tag_fselect = self.d.fselect(filepath = initial_path,
+													   height = 8,
+													   width = 50,
+													   title = title)
+			if code_fselect == self.d.OK:
+				if tag_fselect == "":
 					self.d.msgbox("\nSelect a file. Required value (PEM file).", 7, 50, title = "Error Message")
 				else:
-					ext = Path(tag_df).suffix
-					if not ext == ".pem":
+					ext_file = Path(tag_fselect).suffix
+					if not ext_file == ".pem":
 						self.d.msgbox("\nSelect a file. Required value (PEM file).", 7, 50, title = "Error Message")
 					else:
-						return tag_df
-			if code_fd == self.d.CANCEL:
+						return tag_fselect
+			elif code_fselect == self.d.CANCEL:
 				self.mainMenu()
 
 	"""
+	Method that generates an interface to select a directory.
 
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	initial_path -- Initial path in the interface.
+	title -- Title displayed on the interface.
+
+	Return:
+	tag_dselect -- Selected directory.
 	"""
 	def getDirectory(self, initial_path, title):
 		while True:
-			code_dd, tag_dd = self.d.dselect(initial_path, 8, 50, title = title)
-			if code_dd == self.d.OK:
-				if tag_dd == "":
+			code_dselect, tag_dselect = self.d.dselect(filepath = initial_path,
+													   height = 8,
+													   width = 50,
+													   title = title)
+			if code_dselect == self.d.OK:
+				if tag_dselect == "":
 					self.d.msgbox("\nSelect a directory. Required value (not empty).", 7, 50, title = "Error Message")
 				else:
-					return tag_dd
-			if code_dd == self.d.CANCEL:
+					return tag_dselect
+			elif code_dselect == self.d.CANCEL:
 				self.mainMenu()
+
+	"""
+	Method that generates an interface that allows the user
+	to select between a range of integers using a kind of
+	slider control.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	text -- Text displayed on the interface.
+	min_value -- Minimum accepted value.
+	max_value -- Maximum accepted value.
+	initial_value -- Default value shown on the interface.
+	title -- Title displayed on the interface.
+
+	Return:
+	tag_rangebox -- Selected integer value.
+	"""
+	def getRangeBox(self, text, min_value, max_value, initial_value, title):
+		code_rangebox, tag_rangebox = self.d.rangebox(text = text,
+													  height = 3,
+													  width = 50,
+													  min = min_value,
+													  max = max_value,
+													  init = initial_value,
+													  title = title)
+		if code_rangebox == self.d.OK:
+			return tag_rangebox
+		elif code_rangebox == self.d.CANCEL:
+			self.mainMenu()
 
 	"""
 	Method that generates an interface where it is allowed
@@ -252,20 +316,15 @@ class FormDialog:
 	Parameters:
 	self -- An instantiated object of the FormDialogs class.
 	text -- Text displayed on the interface.
-	hour -- Hour.
-	minutes -- Minutes.
 
 	Return:
-	tag_time -- Chosen time.
+	tag_timebox -- Chosen time.
 	"""
-	def getDataTime(self, text, hour, minutes):
-		code_time, tag_time = self.d.timebox(text,
-											hour = hour,
-											minute = minutes,
-											second = 00)
-		if code_time == self.d.OK:
-			return tag_time
-		if code_time == self.d.CANCEL:
+	def getDataTime(self, text):
+		code_timebox, tag_timebox = self.d.timebox(text = text)
+		if code_timebox == self.d.OK:
+			return tag_timebox
+		elif code_timebox == self.d.CANCEL:
 			self.mainMenu()
 
 	"""
@@ -310,7 +369,7 @@ class FormDialog:
 				if opt_conf_true == "Modify":
 					configuration.updateConfiguration()
 		except TypeError as exception:
-			self.utils.createSnapToolLog(exception, 3)
+			self.utils.createSnapRotateToolLog(exception, 3)
 			self.d.msgbox("\nAn error has occurred. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.mainMenu()
 
@@ -327,5 +386,5 @@ class FormDialog:
 					  ("3", "About"),
 					  ("4", "Exit")]
 
-		option_mm = self.getMenu(options_mm, "Main Menu")
+		option_mm = self.getMenu("Choose an option:", options_mm, "Main Menu")
 		self.switchMmenu(int(option_mm))

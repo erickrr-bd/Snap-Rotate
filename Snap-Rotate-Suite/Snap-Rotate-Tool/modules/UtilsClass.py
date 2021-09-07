@@ -1,4 +1,5 @@
 from pwd import getpwnam
+from datetime import date
 from Crypto import Random
 from hashlib import sha256
 from Crypto.Cipher import AES
@@ -62,7 +63,7 @@ class Utils:
 		try:
 			path_final = path.join(path_main, path_dir)
 		except (OSError, TypeError) as exception:
-			self.createSnapRotateLog(exception, 3)
+			self.createSnapRotateToolLog(exception, 3)
 			self.form_dialog.d.msgbox("\nAn error has occurred. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
@@ -87,7 +88,7 @@ class Utils:
 				safe_dump(data, file_yaml, default_flow_style = False)
 			self.ownerChange(path_file_yaml)
 		except IOError as exception:
-			self.createSnapRotateLog(exception, 3)
+			self.createSnapRotateToolLog(exception, 3)
 			self.form_dialog.d.msgbox("\nError creating YAML file. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 
@@ -112,7 +113,7 @@ class Utils:
 			pass_key = file_key.read()
 			file_key.close()
 		except FileNotFoundError as exception:
-			self.createSnapRotateLog(exception, 3)
+			self.createSnapRotateToolLog(exception, 3)
 			self.form_dialog.d.msgbox("\nError opening or reading the Key file. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
@@ -139,7 +140,7 @@ class Utils:
 			gid = getpwnam('snap_rotate').pw_gid
 			chown(path_to_change, uid, gid)
 		except OSError as exception:
-			self.createSnapRotateLog(exception, 3)
+			self.createSnapRotateToolLog(exception, 3)
 			self.form_dialog.d.msgbox("\nFailed to change owner path. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 
@@ -184,7 +185,7 @@ class Utils:
 			IV = Random.new().read(AES.block_size)
 			aes = AES.new(key, AES.MODE_CBC, IV)
 		except Exception as exception:
-			self.createSnapRotateLog(exception, 3)
+			self.createSnapRotateToolLog(exception, 3)
 			self.form_dialog.d.msgbox("\nFailed to encrypt the data. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
@@ -213,7 +214,7 @@ class Utils:
 			IV = text_encrypt[:AES.block_size]
 			aes = AES.new(key, AES.MODE_CBC, IV)
 		except binascii.Error as exception:
-			self.createSnapRotateLog(exception, 3)
+			self.createSnapRotateToolLog(exception, 3)
 			self.form_dialog.d.msgbox("\nFailed to decrypt the data. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
@@ -228,7 +229,7 @@ class Utils:
 	message -- Message to be shown in the log.
 	type_log -- Type of log to write.
 	"""
-	def createSnapRotateLog(self, message, type_log):
+	def createSnapRotateToolLog(self, message, type_log):
 		name_log = '/var/log/Snap-Rotate/snap-rotate-tool-log-' + str(date.today()) + '.log'
 		logger = getLogger('Snap_Rotate_Tool_Log')
 		logger.setLevel(INFO)
