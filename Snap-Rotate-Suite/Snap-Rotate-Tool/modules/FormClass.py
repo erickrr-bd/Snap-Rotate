@@ -4,6 +4,7 @@ from pathlib import Path
 from dialog import Dialog
 from re import compile as re_compile
 from modules.UtilsClass import Utils
+from modules.ServiceClass import Service
 from modules.ConfigurationClass import Configuration
 
 """
@@ -356,22 +357,20 @@ class FormDialog:
 			self.mainMenu()
 
 	"""
-	Method that launches an action based on the option
-	chosen in the main menu.
+	Method that generates an interface with scroll box.
 
 	Parameters:
 	self -- An instantiated object of the FormDialogs class.
-	option -- Chosen option.
+	text -- Text displayed on the interface.
+	title -- Title displayed on the interface.
 	"""
-	def switchMmenu(self, option):
-		if option == 1:
-			self.defineConfiguration()
-		if option == 2:
-			self.serviceMenu()
-		if option == 3:
-			self.getAbout()
-		if option == 4:
-			exit(0)
+	def getScrollBox(self, text, title):
+		code_scrollbox = self.d.scrollbox(text = text,
+										  height = 15,
+										  width = 70,
+										  title = title)
+		if code_scrollbox == self.d.OK:
+			self.mainMenu()
 
 	"""
 	Method that defines the action to be performed on the
@@ -400,6 +399,70 @@ class FormDialog:
 			self.utils.createSnapRotateToolLog(exception, 3)
 			self.d.msgbox("\nAn error has occurred. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.mainMenu()
+
+	"""
+	Method that displays a message on the screen with 
+	information about the application.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	"""
+	def getAbout(self):
+		message = "\nCopyright@2021 Tekium. All rights reserved.\nSnap-Rotate v3.0\nAuthor: Erick Rodriguez\nEmail: erickrr.tbd93@gmail.com, erodriguez@tekium.mx\n" + "License: GPLv3\n\nInv-Alert is a tool that allows you to obtain the daily inventory\nof equipment found in a specific ElasticSearch index, and send it\nvia Telegram at a configurable time."
+		self.getScrollBox(message, "About")
+
+	"""
+	Method that launches an action based on the option
+	chosen in the main menu.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	option -- Chosen option.
+	"""
+	def switchMmenu(self, option):
+		if option == 1:
+			self.defineConfiguration()
+		if option == 2:
+			self.serviceMenu()
+		if option == 3:
+			self.getAbout()
+		if option == 4:
+			exit(0)
+
+	"""
+	Method that launches an action based on the option
+	chosen in the service menu.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	option -- Chosen option.
+	"""
+	def switchSmenu(self, option):
+		service = Service(self)
+		if option == 1:
+			service.startService()
+		if option == 2:
+			service.restartService()
+		if option == 3:
+			service.stopService()
+		if option == 4:
+			service.getStatusService()
+
+	"""
+	Method that defines the menu of options related to
+	the Snap-Rotate service.
+
+	Parameters:
+	self -- An instantiated object of the FormDialogs class.
+	"""
+	def serviceMenu(self):
+		options_sm = [("1", "Start Service"),
+					  ("2", "Restart Service"),
+					  ("3", "Stop Service"),
+					  ("4", "Service Status")]
+
+		option_sm = self.getMenu("Choose an option:", options_sm, "Service Menu")
+		self.switchSmenu(int(option_sm))
 
 	"""
 	Method that defines the menu on the actions to be

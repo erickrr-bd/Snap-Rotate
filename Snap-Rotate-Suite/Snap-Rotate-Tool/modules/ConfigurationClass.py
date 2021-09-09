@@ -76,12 +76,14 @@ class Configuration:
 			data_conf.append(pass_http_auth.decode('utf-8'))
 		else:
 			data_conf.append(False)
+		index_pattern = self.form_dialog.getDataInputText("Enter the name of the index pattern:", "winlogbeat-*")
 		repo_path = self.form_dialog.getDirectory("/etc/Snap-Rotate-Suite", "Repositories Path")
 		frequency_rotation = self.form_dialog.getDataRadioList("Select a option:", self.options_frequency_rotation, "Repository Rotation Frequency")
+		data_conf.append(index_pattern)
 		data_conf.append(repo_path)
 		data_conf.append(frequency_rotation)
 		if frequency_rotation == "Monthly":
-			date_rotate = self.form_dialog.getRangeBox("Choose the number of the month in which the snapshots will be made:", 1, 31, 1, "Day Of The Month")
+			date_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, 1, "Day Of The Month")
 			time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:")
 			data_conf.append(date_rotate)
 			data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))
@@ -290,7 +292,7 @@ class Configuration:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
 			last_index += 1
 		data_json.update(http_auth_json)
-		aux_json = { 'repo_path' : data_conf[last_index + 1], 'frequency_rotation' : data_conf[last_index + 2], 'date_rotate' : int(data_conf[last_index + 3]), 'time_rotate' : data_conf[last_index + 4] } 
+		aux_json = { 'index_pattern' : data_conf[last_index + 1], 'repo_path' : data_conf[last_index + 2], 'frequency_rotation' : data_conf[last_index + 3], 'date_rotate' : int(data_conf[last_index + 4]), 'time_rotate' : data_conf[last_index + 5] } 
 		data_json.update(aux_json)
 
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')
