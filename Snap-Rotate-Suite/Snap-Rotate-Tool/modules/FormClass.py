@@ -345,12 +345,17 @@ class FormDialog:
 	Parameters:
 	self -- An instantiated object of the FormDialogs class.
 	text -- Text displayed on the interface.
+	hour -- Time displayed on the interface.
+	minutes -- Minutes displayed on the interface.
 
 	Return:
 	tag_timebox -- Chosen time.
 	"""
-	def getDataTime(self, text):
-		code_timebox, tag_timebox = self.d.timebox(text = text)
+	def getDataTime(self, text, hour, minutes):
+		code_timebox, tag_timebox = self.d.timebox(text = text,
+												   hour = hour,
+												   minute = minutes,
+												   second = 00)
 		if code_timebox == self.d.OK:
 			return tag_timebox
 		elif code_timebox == self.d.CANCEL:

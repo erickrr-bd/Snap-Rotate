@@ -72,7 +72,6 @@ class Rotate:
 				else:
 					self.utils.createSnapRotateLog("There are no indexes to back up", 2)
 					print("\nThere are no indexes to back up.")
-				
 		else:
 			self.utils.createSnapRotateLog("ElasticSearch version not supported by Snap-Rotate", 2)
 			print("\nElasticSearch version not supported by Snap-Rotate.")
