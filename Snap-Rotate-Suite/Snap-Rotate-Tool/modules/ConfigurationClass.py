@@ -22,13 +22,8 @@ class Configuration:
 	utils = None
 
 	"""
-	Property that stores the options for how often the
-	inventory will be fetched.
-	"""
-	options_frequency_rotation = [["Monthly", "Monthly rotation", 0]]
-
-	"""
-
+	Property that stores the list that contains the types
+	of snapshots
 	"""
 	options_type_snapshot = [["Only", "All indexes in a snapshot", 0],
 							 ["Multiple", "One snapshot per index", 0]]
@@ -80,17 +75,12 @@ class Configuration:
 			data_conf.append(pass_http_auth.decode('utf-8'))
 		else:
 			data_conf.append(False)
-		index_pattern = self.form_dialog.getDataInputText("Enter the name of the index pattern:", "winlogbeat-*")
 		repo_path = self.form_dialog.getDirectory("/etc/Snap-Rotate-Suite", "Repositories Path")
-		frequency_rotation = self.form_dialog.getDataRadioList("Select a option:", self.options_frequency_rotation, "Repository Rotation Frequency")
-		data_conf.append(index_pattern)
 		data_conf.append(repo_path)
-		data_conf.append(frequency_rotation)
-		if frequency_rotation == "Monthly":
-			date_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, 1, "Day Of The Month")
-			time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:", -1, -1)
-			data_conf.append(date_rotate)
-			data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))
+		day_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, 1, "Day Of The Month")
+		time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:", -1, -1)
+		data_conf.append(day_rotate)
+		data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))
 		type_snapshot = self.form_dialog.getDataRadioList("Select a option:", self.options_type_snapshot, "Snapshot Type")
 		data_conf.append(type_snapshot)
 		self.createFileConfiguration(data_conf)
@@ -124,10 +114,10 @@ class Configuration:
 							("Port", "ElasticSearch Port", 0),
 							("SSL/TLS", "Enable or disable SSL/TLS connection", 0),
 							("HTTP Authentication", "Enable or disable HTTP authentication", 0),
-							("Index Pattern", "ElasticSearch index pattern", 0),
 							("Path", "Repositories path", 0),
 							("Day", "Number of the day of the month", 0),
-							("Time", "Time at which it runs", 0)]
+							("Time", "Time at which it runs", 0),
+							("Type", "Snapshot Type", 0)]
 
 		options_ssl_true = [("Disable", "Disable SSL/TLS communication", 0),
 							("Certificate Validation", "Modify certificate validation", 0)]
@@ -152,10 +142,10 @@ class Configuration:
 		flag_es_port = 0
 		flag_use_ssl = 0
 		flag_use_http_auth = 0
-		flag_index_pattern = 0
 		flag_path_repositories = 0
 		flag_day_month = 0
 		flag_time_execute = 0
+		flag_type_snapshot = 0
 		opt_conf_fields = self.form_dialog.getDataCheckList("Select one or more options:", options_conf_fields, "Configuration File Fields")
 		for option in opt_conf_fields:
 			if option == "Version":
@@ -168,14 +158,14 @@ class Configuration:
 				flag_use_ssl = 1
 			elif option == "HTTP Authentication":
 				flag_use_http_auth = 1
-			elif option == "Index Pattern":
-				flag_index_pattern = 1
 			elif option == "Path":
 				flag_path_repositories = 1
 			elif option == "Day":
 				flag_day_month = 1
 			elif option == "Time":
 				flag_time_execute = 1
+			elif option == "Type":
+				flag_type_snapshot = 1
 		try:
 			data_conf = self.utils.readYamlFile(self.conf_file, 'rU')
 			hash_data_conf = self.utils.getHashToFile(self.conf_file)
@@ -203,13 +193,13 @@ class Configuration:
 								data_conf['valid_certificate'] = False
 								del data_conf['path_certificate']
 							elif opt_valid_cert_true == "Certificate File":
-								cert_file = self.form_dialog.getFileOrDirectory(data_conf['path_certificate'], "Select the CA certificate:")
+								cert_file = self.form_dialog.getFile(data_conf['path_certificate'], "Select the CA certificate:")
 								data_conf['path_certificate'] = cert_file
 						else:
 							opt_valid_cert_false = self.form_dialog.getDataRadioList("Select a option:", options_valid_cert_false, "Certificate Validation")
 							if opt_valid_cert_false == "Enable":
 								data_conf['valid_certificate'] = True
-								cert_file = self.form_dialog.getFileOrDirectory('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
+								cert_file = self.form_dialog.getFile('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
 								path_cert_json = { 'path_certificate' : cert_file }
 								data_conf.update(path_cert_json)
 				else:
@@ -218,7 +208,7 @@ class Configuration:
 						data_conf['use_ssl'] = True
 						valid_certificate = self.form_dialog.getDataYesOrNo("\nDo you want the certificate for SSL/TLS communication to be validated?", "Certificate Validation")
 						if valid_certificate == "ok":
-							cert_file = self.form_dialog.getFileOrDirectory('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
+							cert_file = self.form_dialog.getFile('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
 							valid_cert_json = { 'valid_certificate' : True, 'path_certificate' : cert_file }
 						else:
 							valid_cert_json = { 'valid_certificate' : False}
@@ -253,19 +243,24 @@ class Configuration:
 						pass_http_auth = self.utils.encryptAES(self.form_dialog.getDataPassword("Enter the user's password for HTTP authentication:", "password"))
 						http_auth_data_json = { 'http_auth_user' : user_http_auth.decode('utf-8'), 'http_auth_pass' : pass_http_auth.decode('utf-8') }
 						data_conf.update(http_auth_data_json)
-			if flag_index_pattern == 1:
-				index_pattern = self.form_dialog.getDataInputText("Enter the name of the index pattern:", data_conf['index_pattern'])
-				data_conf['index_pattern'] = index_pattern
 			if flag_path_repositories == 1:
 				repo_path = self.form_dialog.getDirectory(data_conf['repo_path'], "Repositories Path")
 				data_conf['repo_path'] = repo_path
 			if flag_day_month == 1:
 				date_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, int(data_conf['date_rotate']), "Day Of The Month")
-				data_conf['date_rotate'] = int(date_rotate)
+				data_conf['day_rotate'] = int(date_rotate)
 			if flag_time_execute == 1:
 				time_rotate_actual = data_conf['time_rotate'].split(':')
 				time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:", int(time_rotate_actual[0]), int(time_rotate_actual[1]))
 				data_conf['time_rotate'] = str(time_rotate[0]) + ':' + str(time_rotate[1])
+			if flag_type_snapshot == 1:
+				for opt_type in self.options_type_snapshot:
+					if opt_type[0] == data_conf['type_snapshot']:
+						opt_type[2] = 1
+					else:
+						opt_type[2] = 0
+				type_snapshot = self.form_dialog.getDataRadioList("Select a option:", self.options_type_snapshot, "Snapshot Type")
+				data_conf['type_snapshot'] = type_snapshot
 			self.utils.createYamlFile(data_conf, self.conf_file, 'w')
 			hash_data_conf_upd = self.utils.getHashToFile(self.conf_file)
 			if hash_data_conf == hash_data_conf_upd:
@@ -312,7 +307,7 @@ class Configuration:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
 			last_index += 1
 		data_json.update(http_auth_json)
-		aux_json = { 'index_pattern' : data_conf[last_index + 1], 'repo_path' : data_conf[last_index + 2], 'frequency_rotation' : data_conf[last_index + 3], 'date_rotate' : int(data_conf[last_index + 4]), 'time_rotate' : data_conf[last_index + 5], 'type_snapshot' : data_conf[last_index + 6] } 
+		aux_json = { 'repo_path' : data_conf[last_index + 1], 'day_rotate' : int(data_conf[last_index + 2]), 'time_rotate' : data_conf[last_index + 3], 'type_snapshot' : data_conf[last_index + 4] } 
 		data_json.update(aux_json)
 
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')

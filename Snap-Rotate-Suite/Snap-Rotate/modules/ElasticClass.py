@@ -140,13 +140,14 @@ class Elastic:
 	def getIndicesElastic(self, conn_es, index_pattern):
 		try:
 			list_all_index = []
-			list_all_index = conn_es.indices.get(index_pattern)
+			list_all_index = conn_es.indices.get('*')
+			list_all_index = sorted([index for index in list_all_indices if not index.startswith('.')])
 		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nError getting the indices. For more information, see the logs.")
 		else:
 			return list_all_index
-
+			
 	"""
 	Method that gets if an index is writeable or not.
 	
