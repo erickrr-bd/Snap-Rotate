@@ -118,17 +118,15 @@ class Elastic:
 			return conn_es
 
 	"""
-	Method that obtains all the names of the indices that
-	comply with an index pattern.
+	Method that gets all the names of the allowed indexes.
 
 	Parameters:
 	self -- An instantiated object of the Elastic class.
 	conn_es -- Object that contains the connection to
 			   ElasticSearch.
-	index_pattern -- ElasticSearch index pattern.
 
 	Return:
-	list_all_index -- List with the names of the indices
+	list_all_indices -- List with the names of the indices
 					  found.
 
 	Exceptions:
@@ -137,16 +135,16 @@ class Elastic:
 	exceptions.AuthorizationException -- Exception representing
 										 a 403 status code.
 	"""
-	def getIndicesElastic(self, conn_es, index_pattern):
+	def getIndicesElastic(self, conn_es):
 		try:
-			list_all_index = []
-			list_all_index = conn_es.indices.get('*')
-			list_all_index = sorted([index for index in list_all_indices if not index.startswith('.')])
+			list_all_indices = []
+			list_all_indices = conn_es.indices.get('*')
+			list_all_indices = sorted([index for index in list_all_indices if not index.startswith('.')])
 		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nError getting the indices. For more information, see the logs.")
 		else:
-			return list_all_index
+			return list_all_indices
 			
 	"""
 	Method that gets if an index is writeable or not.

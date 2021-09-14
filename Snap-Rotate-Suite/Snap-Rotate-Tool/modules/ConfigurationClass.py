@@ -247,7 +247,7 @@ class Configuration:
 				repo_path = self.form_dialog.getDirectory(data_conf['repo_path'], "Repositories Path")
 				data_conf['repo_path'] = repo_path
 			if flag_day_month == 1:
-				date_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, int(data_conf['date_rotate']), "Day Of The Month")
+				date_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, int(data_conf['day_rotate']), "Day Of The Month")
 				data_conf['day_rotate'] = int(date_rotate)
 			if flag_time_execute == 1:
 				time_rotate_actual = data_conf['time_rotate'].split(':')
@@ -271,7 +271,7 @@ class Configuration:
 			self.form_dialog.mainMenu()
 		except (OSError, KeyError) as exception:
 			self.utils.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("Error modifying the configuration file. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox("\nError modifying the configuration file. For more information, see the logs.", 8, 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 
 	"""
