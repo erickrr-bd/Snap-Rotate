@@ -44,7 +44,6 @@ Characteristics:
 - Python Libraries
   - elasticsearch-dsl
   - requests
-  - pycurl
   - pythondialog
   - pycryptodome
   - pyyaml
