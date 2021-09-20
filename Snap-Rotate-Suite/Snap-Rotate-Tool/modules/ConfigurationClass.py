@@ -83,6 +83,11 @@ class Configuration:
 		data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))
 		type_snapshot = self.form_dialog.getDataRadioList("Select a option:", self.options_type_snapshot, "Snapshot Type")
 		data_conf.append(type_snapshot)
+		delete_index = self.form_dialog.getDataYesOrNo("\nWill the indexes stored in the snapshot (s) be automatically deleted?", "Remove Indices")
+		if delete_index == "ok":
+			data_conf.append(True)
+		else:
+			data_conf.append(False)
 		self.createFileConfiguration(data_conf)
 		if path.exists(self.conf_file):
 			self.utils.createSnapRotateToolLog("Configuration file created", 1)
@@ -117,7 +122,8 @@ class Configuration:
 							("Path", "Repositories path", 0),
 							("Day", "Number of the day of the month", 0),
 							("Time", "Time at which it runs", 0),
-							("Type", "Snapshot Type", 0)]
+							("Type", "Snapshot Type", 0),
+							("Remove", "Delete indexes automatically", 0)]
 
 		options_ssl_true = [("Disable", "Disable SSL/TLS communication", 0),
 							("Certificate Validation", "Modify certificate validation", 0)]
@@ -137,6 +143,10 @@ class Configuration:
 		options_http_auth_data = [("Username", "Username for HTTP authentication", 0),
 								 ("Password", "User password", 0)]
 
+		options_remove_index_true = [("Disable", "Disable automatic index removal", 0)]
+
+		options_remove_index_false = [("Enable", "Enable automatic index removal", 0)]
+
 		flag_version = 0
 		flag_es_host = 0
 		flag_es_port = 0
@@ -146,6 +156,7 @@ class Configuration:
 		flag_day_month = 0
 		flag_time_execute = 0
 		flag_type_snapshot = 0
+		flag_remove = 0
 		opt_conf_fields = self.form_dialog.getDataCheckList("Select one or more options:", options_conf_fields, "Configuration File Fields")
 		for option in opt_conf_fields:
 			if option == "Version":
@@ -166,6 +177,8 @@ class Configuration:
 				flag_time_execute = 1
 			elif option == "Type":
 				flag_type_snapshot = 1
+			elif option == "Remove":
+				flag_remove = 1
 		try:
 			data_conf = self.utils.readYamlFile(self.conf_file, 'rU')
 			hash_data_conf = self.utils.getHashToFile(self.conf_file)
@@ -261,6 +274,15 @@ class Configuration:
 						opt_type[2] = 0
 				type_snapshot = self.form_dialog.getDataRadioList("Select a option:", self.options_type_snapshot, "Snapshot Type")
 				data_conf['type_snapshot'] = type_snapshot
+			if flag_remove == 1:
+				if data_conf['delete_index'] == True:
+					opt_remove_index_true = self.form_dialog.getDataRadioList("Select a option:", options_remove_index_true, "Remove Indices")
+					if opt_remove_index_true == "Disable":
+						data_conf['delete_index'] = False
+				else:
+					opt_remove_index_false = self.form_dialog.getDataRadioList("Select a option:", options_remove_index_false, "Remove Indices")
+					if opt_remove_index_false == "Enable":
+						data_conf['delete_index'] = True
 			self.utils.createYamlFile(data_conf, self.conf_file, 'w')
 			hash_data_conf_upd = self.utils.getHashToFile(self.conf_file)
 			if hash_data_conf == hash_data_conf_upd:
@@ -307,7 +329,7 @@ class Configuration:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
 			last_index += 1
 		data_json.update(http_auth_json)
-		aux_json = { 'repo_path' : data_conf[last_index + 1], 'day_rotate' : int(data_conf[last_index + 2]), 'time_rotate' : data_conf[last_index + 3], 'type_snapshot' : data_conf[last_index + 4] } 
+		aux_json = { 'repo_path' : data_conf[last_index + 1], 'day_rotate' : int(data_conf[last_index + 2]), 'time_rotate' : data_conf[last_index + 3], 'type_snapshot' : data_conf[last_index + 4], 'delete_index' : data_conf[last_index + 5] } 
 		data_json.update(aux_json)
 
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')

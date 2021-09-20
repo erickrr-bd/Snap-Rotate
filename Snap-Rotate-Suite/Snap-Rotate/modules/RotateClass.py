@@ -46,7 +46,6 @@ class Rotate:
 					if now.day == snap_rotate_conf['day_rotate']:
 						month = months[now.month - 1]
 						name_repository = "Snap_" + month + '_' + str(now.year)
-						print(name_repository)
 						elastic = Elastic(snap_rotate_conf)
 						conn_es = elastic.getConnectionElastic()
 						list_all_indices = elastic.getIndicesElastic(conn_es)
@@ -65,6 +64,7 @@ class Rotate:
 								print('\n'.join(list_indices_not_writeables))
 								indices_to_snapshot = ','.join(list_indices_not_writeables)
 								self.utils.createSnapRotateLog("Indices that are stored in the snapshot: " + indices_to_snapshot, 1)
+								print("\nSnapshot creation has started...")
 								elastic.createSnapshot(conn_es, name_repository, name_repository.lower(), indices_to_snapshot)
 								while True:
 									status_snapshot = elastic.getStatusSnapshot(conn_es, name_repository, name_repository.lower())
@@ -81,6 +81,7 @@ class Rotate:
 								print("\nThe following indices will be stored in the snapshots:\n")
 								print('\n'.join(list_indices_not_writeables))
 								for index in list_indices_not_writeables:
+									print("\nSnapshot creation has started...")
 									elastic.createSnapshot(conn_es, name_repository, index, index)
 									while True:
 										status_snapshot = elastic.getStatusSnapshot(conn_es, name_repository, index)
@@ -93,6 +94,7 @@ class Rotate:
 									if not conn_es.indices.exists(index = index):
 										self.utils.createSnapRotateLog("Index removed: " + index, 1)
 										print("\nIndex removed: " + index)
+							print("\nCompression of the repository has started...")
 							with open_tf(snap_rotate_conf['repo_path'] + '/' + name_repository + '.tar.gz', "w:gz") as tar_file:
 								tar_file.add(snap_rotate_conf['repo_path'] + '/' + name_repository)
 							self.utils.createSnapRotateLog("The repository has been compressed: " + name_repository, 1)
