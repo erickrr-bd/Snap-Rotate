@@ -88,6 +88,11 @@ class Configuration:
 			data_conf.append(True)
 		else:
 			data_conf.append(False)
+		compress_repo = self.form_dialog.getDataYesOrNo("\nDo you require that the repository created be compressed into a file?", "Repository Compression")
+		if compress_repo == "ok":
+			data_conf.append(True)
+		else:
+			data_conf.append(False)
 		self.createFileConfiguration(data_conf)
 		if path.exists(self.conf_file):
 			self.utils.createSnapRotateToolLog("Configuration file created", 1)
@@ -123,7 +128,8 @@ class Configuration:
 							("Day", "Number of the day of the month", 0),
 							("Time", "Time at which it runs", 0),
 							("Type", "Snapshot Type", 0),
-							("Remove", "Delete indexes automatically", 0)]
+							("Remove", "Delete indexes automatically", 0),
+							("Compression", "Compress the repository", 0)]
 
 		options_ssl_true = [("Disable", "Disable SSL/TLS communication", 0),
 							("Certificate Validation", "Modify certificate validation", 0)]
@@ -147,6 +153,10 @@ class Configuration:
 
 		options_remove_index_false = [("Enable", "Enable automatic index removal", 0)]
 
+		options_compress_repo_true = [("Disable", "Disable repository compression", 0)]
+
+		options_compress_repo_false = [("Enable", "Enable repository compression", 0)]
+
 		flag_version = 0
 		flag_es_host = 0
 		flag_es_port = 0
@@ -157,6 +167,7 @@ class Configuration:
 		flag_time_execute = 0
 		flag_type_snapshot = 0
 		flag_remove = 0
+		flag_compression = 0
 		opt_conf_fields = self.form_dialog.getDataCheckList("Select one or more options:", options_conf_fields, "Configuration File Fields")
 		for option in opt_conf_fields:
 			if option == "Version":
@@ -179,6 +190,8 @@ class Configuration:
 				flag_type_snapshot = 1
 			elif option == "Remove":
 				flag_remove = 1
+			elif option == "Compression":
+				flag_compression = 1
 		try:
 			data_conf = self.utils.readYamlFile(self.conf_file, 'rU')
 			hash_data_conf = self.utils.getHashToFile(self.conf_file)
@@ -283,6 +296,15 @@ class Configuration:
 					opt_remove_index_false = self.form_dialog.getDataRadioList("Select a option:", options_remove_index_false, "Remove Indices")
 					if opt_remove_index_false == "Enable":
 						data_conf['delete_index'] = True
+			if flag_compression == 1:
+				if data_conf['compress_repo'] == True:
+					opt_compress_repo_true = self.form_dialog.getDataRadioList("Select a option:", options_compress_repo_true, "Repository Compression")
+					if opt_compress_repo_true == "Disable":
+						data_conf['compress_repo'] = False
+				else:
+					opt_compress_repo_false = self.form_dialog.getDataRadioList("Select a option:", options_compress_repo_false, "Repository Compression")
+					if opt_compress_repo_false == "Enable":
+						data_conf['compress_repo'] = True
 			self.utils.createYamlFile(data_conf, self.conf_file, 'w')
 			hash_data_conf_upd = self.utils.getHashToFile(self.conf_file)
 			if hash_data_conf == hash_data_conf_upd:
@@ -329,7 +351,7 @@ class Configuration:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
 			last_index += 1
 		data_json.update(http_auth_json)
-		aux_json = { 'repo_path' : data_conf[last_index + 1], 'day_rotate' : int(data_conf[last_index + 2]), 'time_rotate' : data_conf[last_index + 3], 'type_snapshot' : data_conf[last_index + 4], 'delete_index' : data_conf[last_index + 5] } 
+		aux_json = { 'repo_path' : data_conf[last_index + 1], 'day_rotate' : int(data_conf[last_index + 2]), 'time_rotate' : data_conf[last_index + 3], 'type_snapshot' : data_conf[last_index + 4], 'delete_index' : data_conf[last_index + 5], 'compress_repo' : data_conf[last_index + 6] } 
 		data_json.update(aux_json)
 
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')
