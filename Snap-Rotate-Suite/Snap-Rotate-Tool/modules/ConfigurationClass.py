@@ -38,12 +38,10 @@ class Configuration:
 		self.conf_file = self.utils.getPathSnapRotate("conf") + "/snap_rotate_conf.yaml"
 
 	"""
-	Method where all the necessary information for the
-	configuration of Snap-Rotate is defined.
+	Method where all the necessary information for the configuration of Snap-Rotate is defined.
 
 	Parameters:
-	self -- An instantiated object of the Configuration
-			class.
+	self -- An instantiated object of the Configuration class.
 	"""
 	def createConfiguration(self):
 		data_conf = []
@@ -103,21 +101,14 @@ class Configuration:
 		self.form_dialog.mainMenu()
 
 	"""
-	Method that modifies one or more values in the Snap-Rotate
-	configuration file.	
+	Method that modifies one or more values in the Snap-Rotate configuration file.	
 
 	Parameters:
 	self -- An instantiated object of the Configuration class.
 
 	Exceptions:
-	KeyError -- A Python KeyError exception is what is raised
-		   		when you try to access a key that isn’t in a 
-		   		dictionary (dict). 
-	OSError -- This exception is raised when a system function
-	           returns a system-related error, including I/O
-	           failures such as “file not found” or “disk full”
-	           (not for illegal argument types or other incidental
-	           errors).
+	KeyError -- A Python KeyError exception is what is raised when you try to access a key that isn’t in a  dictionary (dict). 
+	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
 	"""
 	def updateConfiguration(self):
 		options_conf_fields = [("Version", "ElasticSearch Version", 0),
@@ -327,13 +318,11 @@ class Configuration:
 			self.form_dialog.mainMenu()
 
 	"""
-	Method that creates the YAML file where the configuration
-	is stored.
+	Method that creates the YAML file where the configuration is stored.
 
 	Parameters:
 	self -- An instantiated object of the Configuration class.
-	data_conf -- Variable where all the information related to
-				 the configuration is stored.
+	data_conf -- Variable where all the information related to the configuration is stored.
 	"""
 	def createFileConfiguration(self, data_conf):
 		data_json = {'es_version' : data_conf[0],
