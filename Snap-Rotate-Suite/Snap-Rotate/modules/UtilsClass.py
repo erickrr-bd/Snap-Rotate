@@ -9,13 +9,11 @@ from Crypto.Util.Padding import unpad
 from logging import getLogger, INFO, Formatter, FileHandler
 
 """
-Class that allows managing all the utilities that are used for
-the operation of the application.
+Class that allows managing all the utilities that are used for the operation of the application.
 """
 class Utils:
 	"""
-	Property that stores the passphrase that will be used for 
-	the encryption/decryption process.
+	Property that stores the passphrase that will be used for the encryption/decryption process.
 	"""
 	passphrase = None
 
@@ -29,8 +27,7 @@ class Utils:
 		self.passphrase = self.getPassphrase()
 
 	"""
-	Method that obtains and stores the content of a YAML file
-	in a variable.
+	Method that obtains and stores the content of a YAML file in a variable.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
@@ -38,12 +35,10 @@ class Utils:
 	mode -- Mode in which the YAML file will be opened.
 
 	Return:
-	data_file_yaml -- Variable that stores the content of the
-					  YAML file.
+	data_file_yaml -- Variable that stores the content of the YAML file.
 
 	Exceptions:
-	IOError -- It is an error raised when an input/output
-	           operation fails.
+	IOError -- It is an error raised when an input/output operation fails.
 	"""
 	def readYamlFile(self, path_file_yaml, mode):
 		try:
@@ -56,27 +51,18 @@ class Utils:
 			return data_file_yaml
 
 	"""
-	Method that defines a directory based on the main Snap-Rotate
-	directory.
+	Method that defines a directory based on the main Snap-Rotate directory.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
-	path_dir -- Directory that is added to the main Snap-Rotate 
-	            directory.
+	path_dir -- Directory that is added to the main Snap-Rotate directory.
 
 	Return:
 	path_final -- Defined final path.
 
 	Exceptions:
-	OSError -- This exception is raised when a system function
-	           returns a system-related error, including I/O
-	           failures such as “file not found” or “disk full”
-	           (not for illegal argument types or other incidental
-	           errors).
-	TypeError -- Raised when an operation or function is applied
-				 to an object of inappropriate type. The associated
-				 value is a string giving details about the type 
-				 mismatch.
+	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
+	TypeError -- Raised when an operation or function is applied to an object of inappropriate type. The associated value is a string giving details about the type mismatch.
 	"""
 	def getPathSnapRotate(self, path_dir):
 		path_main = "/etc/Snap-Rotate-Suite/Snap-Rotate"
@@ -89,8 +75,7 @@ class Utils:
 			return path_final
 
 	"""
-	Method that obtains the passphrase used for the process of
-	encrypting and decrypting a file.
+	Method that obtains the passphrase used for the process of encrypting and decrypting a file.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
@@ -99,9 +84,7 @@ class Utils:
 	pass_key -- Passphrase in a character string.
 
 	Exceptions:
-	FileNotFoundError -- This is an exception in python and it
-						 comes when a file does not exist
-						 and we want to use it. 
+	FileNotFoundError -- This is an exception in python and it comes when a file does not exist and we want to use it. 
 	"""
 	def getPassphrase(self):
 		try:
@@ -126,9 +109,7 @@ class Utils:
 	Character string with decrypted text.
 
 	Exceptions:
-	binascii.Error -- Is raised if were incorrectly padded or
-					  if there are non-alphabet characters
-					  present in the string. 
+	binascii.Error -- Is raised if were incorrectly padded or if there are non-alphabet characters present in the string. 
 	"""
 	def decryptAES(self, text_encrypt):
 		try:
@@ -143,19 +124,14 @@ class Utils:
 			return unpad(aes.decrypt(text_encrypt[AES.block_size:]), AES.block_size)
 
 	"""
-	Method that changes an owner path, by snap_rotate user and 
-	group.
+	Method that changes an owner path, by snap_rotate user and group.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
 	path_to_change -- Directory that will change owner.
 
 	Exceptions:
-	OSError -- This exception is raised when a system function
-	           returns a system-related error, including I/O
-	           failures such as “file not found” or “disk full”
-	           (not for illegal argument types or other incidental
-	           errors).
+	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
 	"""
 	def ownerChange(self, path_to_change):
 		try:
@@ -167,8 +143,7 @@ class Utils:
 			print("\nFailed to change owner path. For more information, see the logs.")
 
 	"""
-	Method that writes the logs generated by the application in
-	a file.
+	Method that writes the logs generated by the application in a file.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.

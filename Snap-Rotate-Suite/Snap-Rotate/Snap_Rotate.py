@@ -3,7 +3,7 @@
 from modules.RotateClass import Rotate
 
 """
-FormDialogs type object.
+Rotate type object.
 """
 rotate = Rotate()
 

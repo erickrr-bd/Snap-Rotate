@@ -6,8 +6,7 @@ from modules.UtilsClass import Utils
 from modules.LoggerClass import Logger
 
 """
-Class that allows you to manage the sending of alerts
-through Telegram.
+Class that allows you to manage the sending of alerts through Telegram.
 """
 class Telegram:
 	"""
@@ -54,8 +53,7 @@ class Telegram:
 		self.getStatusByTelegramCode(status_code)
 
 	"""
-	Method that creates the header of the message that will
-	be sent to Telegram.
+	Method that creates the header of the message that will be sent to Telegram.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
@@ -68,15 +66,12 @@ class Telegram:
 		return header
 
 	"""
-	Method that generates the message in Telegram for when
-	the creation of a snapshot has begun.
+	Method that generates the message in Telegram for when the creation of a snapshot has begun.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
-	index_name -- Name of the index that will be saved in
-				  the snapshot.
-	repository_name -- Name of the repository where the
-					   snapshot will be saved.
+	index_name -- Name of the index that will be saved in the snapshot.
+	repository_name -- Name of the repository where the snapshot will be saved.
 
 	Return:
 	message -- Message to send.
@@ -90,8 +85,7 @@ class Telegram:
 		return message
 
 	"""
-	Method that generates the message in Telegram for when
-	the creation of a repository is finished.
+	Method that generates the message in Telegram for when the creation of a repository is finished.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
@@ -109,14 +103,12 @@ class Telegram:
 		return message
 
 	"""
-	Method that generates the message in Telegram for when
-	the creation of a snapshot has finished.
+	Method that generates the message in Telegram for when the creation of a snapshot has finished.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
 	snapshot_name -- Name of the snapshot created.
-	repository_name -- Name of the repository where the
-					   snapshot was saved.
+	repository_name -- Name of the repository where the snapshot was saved.
 	start_time -- Time when snapshot creation started.
 	end_time -- Time when snapshot creation finished.
 
@@ -133,8 +125,7 @@ class Telegram:
 		return message
 
 	"""
-	Method that generates the message in Telegram for when
-	an index is eliminated.
+	Method that generates the message in Telegram for when an index is eliminated.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
@@ -150,13 +141,11 @@ class Telegram:
 		return message
 
 	"""
-	Method that generates the message in Telegram for
-	when a repository is compressed.
+	Method that generates the message in Telegram for when a repository is compressed.
 	
 	Parameters:
 	self -- An instantiated object of the Telegram class.
-	path_compress_file -- Path of the resulting compressed
-						  file.
+	path_compress_file -- Path of the resulting compressed file.
 
 	Return:
 	message -- Message to send.
@@ -168,13 +157,11 @@ class Telegram:
 		return message
 	
 	"""
-	Method that prints the status of the alert delivery based
-	on the response HTTP code.
+	Method that prints the status of the alert delivery based on the response HTTP code.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
-	telegram_code -- HTTP code in response to the request made
-					 to Telegram.
+	telegram_code -- HTTP code in response to the request made to Telegram.
 	"""
 	def getStatusByTelegramCode(self, telegram_code):
 		if telegram_code == 200:
