@@ -21,7 +21,7 @@ class Configuration:
 	utils = None
 
 	"""
-	Property that stores the list that contains the types of snapshots
+	List containing the types of snapshots that can be created.
 	"""
 	options_type_snapshot = [["Only", "All indexes in a snapshot", 0],
 							 ["Multiple", "One snapshot per index", 0]]
@@ -38,7 +38,7 @@ class Configuration:
 		self.conf_file = self.utils.getPathSnapRotate("conf") + "/snap_rotate_conf.yaml"
 
 	"""
-	Method where all the necessary information for the configuration of Snap-Rotate is defined.
+	Method that defines the information that will be stored in the configuration file.
 
 	Parameters:
 	self -- An instantiated object of the Configuration class.
@@ -101,7 +101,7 @@ class Configuration:
 		self.form_dialog.mainMenu()
 
 	"""
-	Method that modifies one or more values in the Snap-Rotate configuration file.	
+	Method that allows modifying one or more values assigned in the configuration file.
 
 	Parameters:
 	self -- An instantiated object of the Configuration class.
@@ -221,7 +221,7 @@ class Configuration:
 							opt_valid_cert_false = self.form_dialog.getDataRadioList("Select a option:", options_valid_cert_false, "Certificate Validation")
 							if opt_valid_cert_false == "Enable":
 								data_conf['valid_certificate'] = True
-								cert_file = self.form_dialog.getFile('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
+								cert_file = self.form_dialog.getFile('/etc/Snap-Rotate-Suite/Snap-Rotate', "Select the CA certificate:")
 								path_cert_json = { 'path_certificate' : cert_file }
 								data_conf.update(path_cert_json)
 				else:
@@ -230,7 +230,7 @@ class Configuration:
 						data_conf['use_ssl'] = True
 						valid_certificate = self.form_dialog.getDataYesOrNo("\nDo you want the certificate for SSL/TLS communication to be validated?", "Certificate Validation")
 						if valid_certificate == "ok":
-							cert_file = self.form_dialog.getFile('/etc/Inv-Alert-Suite/Inv-Alert', "Select the CA certificate:")
+							cert_file = self.form_dialog.getFile('/etc/Snap-Rotate-Suite/Snap-Rotate', "Select the CA certificate:")
 							valid_cert_json = { 'valid_certificate' : True, 'path_certificate' : cert_file }
 						else:
 							valid_cert_json = { 'valid_certificate' : False}
@@ -322,7 +322,7 @@ class Configuration:
 
 	Parameters:
 	self -- An instantiated object of the Configuration class.
-	data_conf -- Variable where all the information related to the configuration is stored.
+	data_conf -- Object where the information to be stored in the configuration file is located.
 	"""
 	def createFileConfiguration(self, data_conf):
 		data_json = {'es_version' : data_conf[0],
