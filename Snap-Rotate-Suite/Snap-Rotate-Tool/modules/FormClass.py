@@ -18,21 +18,22 @@ class FormDialog:
 	d = None
 
 	"""
-	Constructor for the FormDialogs class.
+	Constructor for the FormDialog class.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog
+			class.
 	"""
 	def __init__(self):
-		self.utils = Utils(self)
 		self.d = Dialog(dialog = "dialog")
+		self.utils = Utils(self)
 		self.d.set_background_title("SNAP-ROTATE-TOOL")
 
 	"""
 	Method that generates the menu interface.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	options -- List of options that make up the menu.
 	title -- Title displayed on the interface.
@@ -55,7 +56,7 @@ class FormDialog:
 	chosen.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	options -- List of options that make up the interface.
 	title -- Title displayed on the interface.
@@ -83,7 +84,7 @@ class FormDialog:
 	of them.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	options -- List of options that make up the interface.
 	title -- Title displayed on the interface.
@@ -110,7 +111,7 @@ class FormDialog:
 	or floating type data.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	initial_value -- Default value shown on the interface.
 
@@ -137,7 +138,7 @@ class FormDialog:
 	address.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	initial_value -- Default value shown on the interface.
 
@@ -163,7 +164,7 @@ class FormDialog:
 	Method that generates an interface to enter a port.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	initial_value -- Default value shown on the interface.
 
@@ -189,7 +190,7 @@ class FormDialog:
 	Method that generates an interface to enter text.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	initial_value -- Default value shown on the interface.
 
@@ -214,7 +215,7 @@ class FormDialog:
 	Method that generates an interface to enter a password.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	initial_value -- Default value shown on the interface.
 
@@ -241,7 +242,7 @@ class FormDialog:
 	(yes / no).
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	title -- Title displayed on the interface.
 
@@ -259,7 +260,7 @@ class FormDialog:
 	Method that generates an interface to select a file.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	initial_path -- Initial path in the interface.
 	title -- Title displayed on the interface.
 
@@ -288,7 +289,7 @@ class FormDialog:
 	Method that generates an interface to select a directory.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	initial_path -- Initial path in the interface.
 	title -- Title displayed on the interface.
 
@@ -310,40 +311,11 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
-	Method that generates an interface that allows the user
-	to select between a range of integers using a kind of
-	slider control.
-
-	Parameters:
-	self -- An instantiated object of the FormDialogs class.
-	text -- Text displayed on the interface.
-	min_value -- Minimum accepted value.
-	max_value -- Maximum accepted value.
-	initial_value -- Default value shown on the interface.
-	title -- Title displayed on the interface.
-
-	Return:
-	tag_rangebox -- Selected integer value.
-	"""
-	def getRangeBox(self, text, min_value, max_value, initial_value, title):
-		code_rangebox, tag_rangebox = self.d.rangebox(text = text,
-													  height = 3,
-													  width = 50,
-													  min = min_value,
-													  max = max_value,
-													  init = initial_value,
-													  title = title)
-		if code_rangebox == self.d.OK:
-			return tag_rangebox
-		elif code_rangebox == self.d.CANCEL:
-			self.mainMenu()
-
-	"""
 	Method that generates an interface where it is allowed
 	to select a time.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	hour -- Time displayed on the interface.
 	minutes -- Minutes displayed on the interface.
@@ -365,7 +337,7 @@ class FormDialog:
 	Method that generates an interface with scroll box.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	text -- Text displayed on the interface.
 	title -- Title displayed on the interface.
 	"""
@@ -382,7 +354,7 @@ class FormDialog:
 	Snap-Rotate configuration file (creation or modification).
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	"""
 	def defineConfiguration(self):
 		configuration = Configuration(self)
@@ -410,10 +382,10 @@ class FormDialog:
 	information about the application.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	"""
 	def getAbout(self):
-		message = "\nCopyright@2021 Tekium. All rights reserved.\nSnap-Rotate v3.0\nAuthor: Erick Rodriguez\nEmail: erickrr.tbd93@gmail.com, erodriguez@tekium.mx\n" + "License: GPLv3\n\nInv-Alert is a tool that allows you to obtain the daily inventory\nof equipment found in a specific ElasticSearch index, and send it\nvia Telegram at a configurable time."
+		message = "\nCopyright@2021 Tekium. All rights reserved.\nSnap-Rotate v3.0\nAuthor: Erick Rodriguez\nEmail: erickrr.tbd93@gmail.com, erodriguez@tekium.mx\n" + "License: GPLv3\n\nSnap-Rotate is an application that creates a repository every last\nday of the month, and it stores snapshots of certain indexes."
 		self.getScrollBox(message, "About")
 
 	"""
@@ -421,7 +393,7 @@ class FormDialog:
 	chosen in the main menu.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	option -- Chosen option.
 	"""
 	def switchMmenu(self, option):
@@ -439,7 +411,7 @@ class FormDialog:
 	chosen in the service menu.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	option -- Chosen option.
 	"""
 	def switchSmenu(self, option):
@@ -458,7 +430,7 @@ class FormDialog:
 	the Snap-Rotate service.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	"""
 	def serviceMenu(self):
 		options_sm = [("1", "Start Service"),
@@ -474,7 +446,7 @@ class FormDialog:
 	carried out in the main menu.
 
 	Parameters:
-	self -- An instantiated object of the FormDialogs class.
+	self -- An instantiated object of the FormDialog class.
 	"""
 	def mainMenu(self):
 		options_mm = [("1", "Snap-Rotate Configuration"),

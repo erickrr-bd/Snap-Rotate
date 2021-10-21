@@ -3,13 +3,13 @@
 from modules.FormClass import FormDialog
 
 """
-FormDialogs type object.
+FormDialog type object.
 """
-forms = FormDialog()
+form = FormDialog()
 
 """
 Main function of the application
 """
 if __name__ == "__main__":
 	while True:
-		forms.mainMenu()
+		form.mainMenu()

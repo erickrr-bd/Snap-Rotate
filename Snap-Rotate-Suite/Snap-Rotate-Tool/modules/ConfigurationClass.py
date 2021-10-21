@@ -12,7 +12,8 @@ class Configuration:
 	form_dialog = None
 
 	"""
-	Property that stores the path of the configuration file.
+	Property that stores the path of the configuration
+	file.
 	"""
 	conf_file = None
 
@@ -32,7 +33,8 @@ class Configuration:
 	Constructor for the Configuration class.
 
 	Parameters:
-	self -- An instantiated object of the Configuration class.
+	self -- An instantiated object of the Configuration
+			class.
 	"""
 	def __init__(self, form_dialog):
 		self.form_dialog = form_dialog
@@ -44,15 +46,16 @@ class Configuration:
 	configuration of Snap-Rotate is defined.
 
 	Parameters:
-	self -- An instantiated object of the Configuration class.
+	self -- An instantiated object of the Configuration
+			class.
 	"""
 	def createConfiguration(self):
 		data_conf = []
-		version_es = self.form_dialog.getDataNumberDecimal("Enter the ElasticSearch version:", "7.14")
-		host_es = self.form_dialog.getDataIP("Enter the ElasticSearch IP address:", "localhost")
-		port_es = self.form_dialog.getDataPort("Enter the ElasticSearch listening port:", "9200")
+		version_es = self.form_dialog.getDataNumberDecimal("Enter the ElasticSearch version:", "7.15")
 		data_conf.append(version_es)
+		host_es = self.form_dialog.getDataIP("Enter the ElasticSearch IP address:", "localhost")
 		data_conf.append(host_es)
+		port_es = self.form_dialog.getDataPort("Enter the ElasticSearch listening port:", "9200")
 		data_conf.append(port_es)
 		use_ssl = self.form_dialog.getDataYesOrNo("\nDo you want Snap-Rotate to connect to ElasticSearch using the SSL/TLS protocol?", "Connection Via SSL/TLS")
 		if use_ssl == "ok":
@@ -70,20 +73,18 @@ class Configuration:
 		if http_auth == "ok":
 			data_conf.append(True)
 			user_http_auth = self.utils.encryptAES(self.form_dialog.getDataInputText("Enter the username for HTTP authentication:", "user_http"))
-			pass_http_auth = self.utils.encryptAES(self.form_dialog.getDataPassword("Enter the user's password for HTTP authentication:", "password"))
 			data_conf.append(user_http_auth.decode('utf-8'))
+			pass_http_auth = self.utils.encryptAES(self.form_dialog.getDataPassword("Enter the user's password for HTTP authentication:", "password"))
 			data_conf.append(pass_http_auth.decode('utf-8'))
 		else:
 			data_conf.append(False)
 		repo_path = self.form_dialog.getDirectory("/etc/Snap-Rotate-Suite", "Repositories Path")
 		data_conf.append(repo_path)
-		day_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, 1, "Day Of The Month")
 		time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:", -1, -1)
-		data_conf.append(day_rotate)
 		data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))
 		type_snapshot = self.form_dialog.getDataRadioList("Select a option:", self.options_type_snapshot, "Snapshot Type")
 		data_conf.append(type_snapshot)
-		delete_index = self.form_dialog.getDataYesOrNo("\nWill the indexes stored in the snapshot (s) be automatically deleted?", "Remove Indices")
+		delete_index = self.form_dialog.getDataYesOrNo("\nWill the indexes stored in the snapshot(s) be automatically deleted?", "Remove Indices")
 		if delete_index == "ok":
 			data_conf.append(True)
 		else:
@@ -93,6 +94,10 @@ class Configuration:
 			data_conf.append(True)
 		else:
 			data_conf.append(False)
+		telegram_bot_token = self.utils.encryptAES(self.form_dialog.getDataInputText("Enter the Telegram bot token:", "751988420:AAHrzn7RXWxVQQNha0tQUzyouE5lUcPde1g"))
+		data_conf.append(telegram_bot_token.decode('utf-8'))
+		telegram_chat_id = self.utils.encryptAES(self.form_dialog.getDataInputText("Enter the Telegram channel identifier:", "-1002365478941"))
+		data_conf.append(telegram_chat_id.decode('utf-8'))
 		self.createFileConfiguration(data_conf)
 		if path.exists(self.conf_file):
 			self.utils.createSnapRotateToolLog("Configuration file created", 1)
@@ -125,11 +130,12 @@ class Configuration:
 							("SSL/TLS", "Enable or disable SSL/TLS connection", 0),
 							("HTTP Authentication", "Enable or disable HTTP authentication", 0),
 							("Path", "Repositories path", 0),
-							("Day", "Number of the day of the month", 0),
 							("Time", "Time at which it runs", 0),
 							("Type", "Snapshot Type", 0),
 							("Remove", "Delete indexes automatically", 0),
-							("Compression", "Compress the repository", 0)]
+							("Compression", "Compress the repository", 0),
+							("Bot Token", "Telegram bot token", 0),
+							("Chat ID", "Telegram channel identifier", 0)]
 
 		options_ssl_true = [("Disable", "Disable SSL/TLS communication", 0),
 							("Certificate Validation", "Modify certificate validation", 0)]
@@ -163,11 +169,12 @@ class Configuration:
 		flag_use_ssl = 0
 		flag_use_http_auth = 0
 		flag_path_repositories = 0
-		flag_day_month = 0
 		flag_time_execute = 0
 		flag_type_snapshot = 0
 		flag_remove = 0
 		flag_compression = 0
+		flag_bot_token = 0
+		flag_chat_id = 0
 		opt_conf_fields = self.form_dialog.getDataCheckList("Select one or more options:", options_conf_fields, "Configuration File Fields")
 		for option in opt_conf_fields:
 			if option == "Version":
@@ -182,8 +189,6 @@ class Configuration:
 				flag_use_http_auth = 1
 			elif option == "Path":
 				flag_path_repositories = 1
-			elif option == "Day":
-				flag_day_month = 1
 			elif option == "Time":
 				flag_time_execute = 1
 			elif option == "Type":
@@ -192,6 +197,10 @@ class Configuration:
 				flag_remove = 1
 			elif option == "Compression":
 				flag_compression = 1
+			elif option == "Bot Token":
+				flag_bot_token = 1
+			elif option == "Chat ID":
+				flag_chat_id = 1
 		try:
 			data_conf = self.utils.readYamlFile(self.conf_file, 'rU')
 			hash_data_conf = self.utils.getHashToFile(self.conf_file)
@@ -272,9 +281,6 @@ class Configuration:
 			if flag_path_repositories == 1:
 				repo_path = self.form_dialog.getDirectory(data_conf['repo_path'], "Repositories Path")
 				data_conf['repo_path'] = repo_path
-			if flag_day_month == 1:
-				date_rotate = self.form_dialog.getRangeBox("Choose the day of the month that Snap-Rotate will create the snapshot:", 1, 31, int(data_conf['day_rotate']), "Day Of The Month")
-				data_conf['day_rotate'] = int(date_rotate)
 			if flag_time_execute == 1:
 				time_rotate_actual = data_conf['time_rotate'].split(':')
 				time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:", int(time_rotate_actual[0]), int(time_rotate_actual[1]))
@@ -305,6 +311,12 @@ class Configuration:
 					opt_compress_repo_false = self.form_dialog.getDataRadioList("Select a option:", options_compress_repo_false, "Repository Compression")
 					if opt_compress_repo_false == "Enable":
 						data_conf['compress_repo'] = True
+			if flag_bot_token == 1:
+				telegram_bot_token = self.utils.encryptAES(self.form_dialog.getDataInputText("Enter the Telegram bot token:", self.utils.decryptAES(data_conf['telegram_bot_token']).decode('utf-8')))
+				data_conf['telegram_bot_token'] = telegram_bot_token.decode('utf-8')
+			if flag_chat_id == 1:
+				telegram_chat_id = self.utils.encryptAES(self.form_dialog.getDataInputText("Enter the Telegram channel identifier:", self.utils.decryptAES(data_conf['telegram_chat_id']).decode('utf-8')))
+				data_conf['telegram_chat_id'] = telegram_chat_id.decode('utf-8')
 			self.utils.createYamlFile(data_conf, self.conf_file, 'w')
 			hash_data_conf_upd = self.utils.getHashToFile(self.conf_file)
 			if hash_data_conf == hash_data_conf_upd:
@@ -351,7 +363,7 @@ class Configuration:
 			http_auth_json = { 'use_http_auth' : data_conf[last_index + 1] }
 			last_index += 1
 		data_json.update(http_auth_json)
-		aux_json = { 'repo_path' : data_conf[last_index + 1], 'day_rotate' : int(data_conf[last_index + 2]), 'time_rotate' : data_conf[last_index + 3], 'type_snapshot' : data_conf[last_index + 4], 'delete_index' : data_conf[last_index + 5], 'compress_repo' : data_conf[last_index + 6] } 
+		aux_json = { 'repo_path' : data_conf[last_index + 1], 'time_rotate' : data_conf[last_index + 2], 'type_snapshot' : data_conf[last_index + 3], 'delete_index' : data_conf[last_index + 4], 'compress_repo' : data_conf[last_index + 5], 'telegram_bot_token' : data_conf[last_index + 6], 'telegram_chat_id' : data_conf[last_index + 7] } 
 		data_json.update(aux_json)
 
 		self.utils.createYamlFile(data_json, self.conf_file, 'w')

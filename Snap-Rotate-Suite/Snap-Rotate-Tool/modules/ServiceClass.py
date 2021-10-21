@@ -13,7 +13,7 @@ class Service:
 	utils = None
 
 	"""
-	Property that stores an object of type FormDialogs.
+	Property that stores an object of type FormDialog.
 	"""
 	form_dialog = None
 

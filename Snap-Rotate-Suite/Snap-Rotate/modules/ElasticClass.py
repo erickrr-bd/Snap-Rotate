@@ -279,3 +279,32 @@ class Elastic:
 			print("\nFailed to create snapshot. For more information, see the logs.")
 		else:
 			return status_snapshot
+
+	"""
+	Method that obtains information about a particular snapshot.
+
+	Parameters:
+	conn_es -- Object that contains the connection to
+			   ElasticSearch.
+	repository_name -- Name of the repository where the
+					   snapshot is saved.
+	snapshot_name -- Name of the snapshot from which the
+					 information will be obtained.
+
+	Return:
+	snapshot_info -- Snapshot information.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404
+								status code.
+	exceptions.AuthorizationException -- Exception representing
+										 a 403 status code.
+	"""
+	def getSnapshotInfo(self, conn_es, repository_name, snapshot_name):
+		try:
+			snapshot_info = conn_es.snapshot.get(repository = repository_name, snapshot = snapshot_name)
+		except (exceptions.NotFoundError, exceptions.AuthorizationException) as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nFailed to get snapshot status. For more information, see the logs.")
+		else:
+			return snapshot_info
