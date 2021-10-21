@@ -10,18 +10,16 @@ from Crypto.Util.Padding import pad, unpad
 from logging import getLogger, INFO, Formatter, FileHandler
 
 """
-Class that allows managing all the utilities that are used for
-the operation of the application.
+Class that allows managing all the utilities that are used for the operation of the application.
 """
 class Utils:
 	"""
-	Property that stores an object of type FormDialogs.
+	Property that stores an object of type FormDialog.
 	"""
 	form_dialog = None
 
 	"""
-	Property that stores the passphrase that will be used for 
-	the encryption/decryption process.
+	Property that stores the passphrase that will be used for the encryption/decryption process.
 	"""
 	passphrase = None
 
@@ -36,27 +34,18 @@ class Utils:
 		self.passphrase = self.getPassphrase()
 
 	"""
-	Method that defines a directory based on the main Inv-Alert
-	directory.
+	Method that defines a directory based on the main Snap-Rotate directory.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
-	path_dir -- Directory that is added to the main Inv-Alert 
-	            directory.
+	path_dir -- Directory that is added to the main Snap-Rotate directory.
 
 	Return:
 	path_final -- Defined final path.
 
 	Exceptions:
-	OSError -- This exception is raised when a system function
-	           returns a system-related error, including I/O
-	           failures such as “file not found” or “disk full”
-	           (not for illegal argument types or other incidental
-	           errors).
-	TypeError -- Raised when an operation or function is applied
-				 to an object of inappropriate type. The associated
-				 value is a string giving details about the type 
-				 mismatch.
+	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
+	TypeError -- Raised when an operation or function is applied to an object of inappropriate type. The associated value is a string giving details about the type mismatch.
 	"""
 	def getPathSnapRotate(self, path_dir):
 		path_main = "/etc/Snap-Rotate-Suite/Snap-Rotate"
@@ -79,8 +68,7 @@ class Utils:
 	mode -- Mode in which the YAML file will be opened.
 
 	Exceptions:
-	IOError -- It is an error raised when an input/output
-	           operation fails.
+	IOError -- It is an error raised when an input/output operation fails.
 	"""
 	def createYamlFile(self, data, path_file_yaml, mode):
 		try:
@@ -93,8 +81,7 @@ class Utils:
 			self.form_dialog.mainMenu()
 
 	"""
-	Method that obtains and stores the content of a YAML file
-	in a variable.
+	Method that obtains and stores the content of a YAML file in a variable.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
@@ -102,12 +89,10 @@ class Utils:
 	mode -- Mode in which the YAML file will be opened.
 
 	Return:
-	data_file_yaml -- Variable that stores the content of the
-					  YAML file.
+	data_file_yaml -- Variable that stores the content of the YAML file.
 
 	Exceptions:
-	IOError -- It is an error raised when an input/output
-	           operation fails.
+	IOError -- It is an error raised when an input/output operation fails.
 	"""
 	def readYamlFile(self, path_file_yaml, mode):
 		try:
@@ -120,8 +105,7 @@ class Utils:
 			return data_file_yaml
 
 	"""
-	Method that obtains the passphrase used for the process of
-	encrypting and decrypting a file.
+	Method that obtains the passphrase used for the process of encrypting and decrypting a file.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
@@ -130,9 +114,7 @@ class Utils:
 	pass_key -- Passphrase in a character string.
 
 	Exceptions:
-	FileNotFoundError -- This is an exception in python and it
-						 comes when a file does not exist
-						 and we want to use it. 
+	FileNotFoundError -- This is an exception in python and it comes when a file does not exist and we want to use it. 
 	"""
 	def getPassphrase(self):
 		try:
@@ -147,19 +129,14 @@ class Utils:
 			return pass_key
 
 	"""
-	Method that changes an owner path, by inv_alert user and 
-	group.
+	Method that changes an owner path, by snap_rotate user and group.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
 	path_to_change -- Directory that will change owner.
 
 	Exceptions:
-	OSError -- This exception is raised when a system function
-	           returns a system-related error, including I/O
-	           failures such as “file not found” or “disk full”
-	           (not for illegal argument types or other incidental
-	           errors).
+	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
 	"""
 	def ownerChange(self, path_to_change):
 		try:
@@ -172,13 +149,11 @@ class Utils:
 			self.form_dialog.mainMenu()
 
 	"""
-	Method that validates an entered value based on a defined
-	regular expression.
+	Method that validates an entered value based on a defined regular expression.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
-	regular_expression -- Regular expression with which the 
-						  data will be validated.
+	regular_expression -- Regular expression with which the data will be validated.
 	data_entered -- Data to be validated.
 
 	Return:
@@ -194,15 +169,13 @@ class Utils:
 
 	Parameters:
 	self -- An instantiated object of the Utils class.
-	path_file -- Path of the file from which the hash function will
-	        be obtained.
+	path_file -- Path of the file from which the hash function will be obtained.
 
 	Return:
 	Hash of the file.
 
 	Exceptions:
-	IOError -- It is an error raised when an input/output
-	           operation fails.
+	IOError -- It is an error raised when an input/output operation fails.
 	"""
 	def getHashToFile(self, path_file):
 		try:
@@ -223,15 +196,12 @@ class Utils:
 	Parameters:
 	self -- An instantiated object of the Utils class.
 	text -- Text to encrypt.
-	form_dialog -- A FormDialogs class object.
 
 	Return:
 	Encrypted text.
 
 	Exceptions:
-	binascii.Error -- Is raised if were incorrectly padded or
-					  if there are non-alphabet characters
-					  present in the string. 
+	Exception -- Any exceptions that occur.
 	"""
 	def encryptAES(self, text):
 		try:
@@ -252,15 +222,12 @@ class Utils:
 	Parameters:
 	self -- An instantiated object of the Utils class.
 	text_encrypt -- Text to decipher.
-	form_dialog -- A FormDialogs class object.
 
 	Return:
 	Character string with decrypted text.
 
 	Exceptions:
-	binascii.Error -- Is raised if were incorrectly padded or
-					  if there are non-alphabet characters
-					  present in the string. 
+	binascii.Error -- Is raised if were incorrectly padded or if there are non-alphabet characters present in the string. 
 	"""
 	def decryptAES(self, text_encrypt):
 		try:
@@ -276,8 +243,7 @@ class Utils:
 			return unpad(aes.decrypt(text_encrypt[AES.block_size:]), AES.block_size)
 
 	"""
-	Method that writes the logs generated by the application in
-	a file.
+	Method that writes the logs generated by the application in a file.
 
 	Parameters:
 	self -- An instantiated object of the Utils class.

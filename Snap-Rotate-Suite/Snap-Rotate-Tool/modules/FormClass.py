@@ -8,8 +8,7 @@ from modules.ServiceClass import Service
 from modules.ConfigurationClass import Configuration
 
 """
-Class that allows managing all the graphical interfaces
-of the application.
+Class that allows managing all the graphical interfaces of the application.
 """
 class FormDialog:
 	"""
@@ -21,8 +20,7 @@ class FormDialog:
 	Constructor for the FormDialog class.
 
 	Parameters:
-	self -- An instantiated object of the FormDialog
-			class.
+	self -- An instantiated object of the FormDialog class.
 	"""
 	def __init__(self):
 		self.d = Dialog(dialog = "dialog")
@@ -51,9 +49,7 @@ class FormDialog:
 			exit(0)
 
 	"""
-	Method that generates an interface with several
-	available options, and where only one of them can be
-	chosen.
+	Method that generates an interface with several available options, and where only one of them can be chosen.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -79,9 +75,7 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
-	Method that generates an interface with several
-	available options, and where you can choose one or more
-	of them.
+	Method that generates an interface with several available options, and where you can choose one or more of them.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -107,8 +101,7 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
-	Method that generates the interface for entering decimal
-	or floating type data.
+	Method that generates the interface for entering decimal or floating type data.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -134,8 +127,7 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
-	Method that generates an interface to enter an IP
-	address.
+	Method that generates an interface to enter an IP address.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -238,8 +230,7 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
-	Method that generates a decision-making interface
-	(yes / no).
+	Method that generates a decision-making interface (yes/no).
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -263,11 +254,12 @@ class FormDialog:
 	self -- An instantiated object of the FormDialog class.
 	initial_path -- Initial path in the interface.
 	title -- Title displayed on the interface.
+	extension_file -- Extension valid for the file.
 
 	Return:
 	tag_fselect -- Path of the selected file.
 	"""
-	def getFile(self, initial_path, title):
+	def getFile(self, initial_path, title, extension_file):
 		while True:
 			code_fselect, tag_fselect = self.d.fselect(filepath = initial_path,
 													   height = 8,
@@ -275,11 +267,11 @@ class FormDialog:
 													   title = title)
 			if code_fselect == self.d.OK:
 				if tag_fselect == "":
-					self.d.msgbox("\nSelect a file. Required value (PEM file).", 7, 50, title = "Error Message")
+					self.d.msgbox("\nSelect a file. Required value: " + extension_file + " file.", 7, 50, title = "Error Message")
 				else:
 					ext_file = Path(tag_fselect).suffix
-					if not ext_file == ".pem":
-						self.d.msgbox("\nSelect a file. Required value (PEM file).", 7, 50, title = "Error Message")
+					if not ext_file == extension_file:
+						self.d.msgbox("\nSelect a file. Required value: " + extension_file + " file.", 7, 50, title = "Error Message")
 					else:
 						return tag_fselect
 			elif code_fselect == self.d.CANCEL:
@@ -311,8 +303,7 @@ class FormDialog:
 				self.mainMenu()
 
 	"""
-	Method that generates an interface where it is allowed
-	to select a time.
+	Method that generates an interface where it is allowed to select a time.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -350,8 +341,7 @@ class FormDialog:
 			self.mainMenu()
 
 	"""
-	Method that defines the action to be performed on the
-	Snap-Rotate configuration file (creation or modification).
+	Method that defines the action to be performed on the Snap-Rotate configuration file (creation or modification).
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -378,8 +368,7 @@ class FormDialog:
 			self.mainMenu()
 
 	"""
-	Method that displays a message on the screen with 
-	information about the application.
+	Method that displays a message on the screen with information about the application.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -389,8 +378,7 @@ class FormDialog:
 		self.getScrollBox(message, "About")
 
 	"""
-	Method that launches an action based on the option
-	chosen in the main menu.
+	Method that launches an action based on the option chosen in the main menu.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -407,8 +395,7 @@ class FormDialog:
 			exit(0)
 
 	"""
-	Method that launches an action based on the option
-	chosen in the service menu.
+	Method that launches an action based on the option chosen in the service menu.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -426,8 +413,7 @@ class FormDialog:
 			service.getStatusService()
 
 	"""
-	Method that defines the menu of options related to
-	the Snap-Rotate service.
+	Method that defines the menu of options related to the Snap-Rotate service.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.
@@ -442,8 +428,7 @@ class FormDialog:
 		self.switchSmenu(int(option_sm))
 
 	"""
-	Method that defines the menu on the actions to be
-	carried out in the main menu.
+	Method that defines the menu on the actions to be carried out in the main menu.
 
 	Parameters:
 	self -- An instantiated object of the FormDialog class.

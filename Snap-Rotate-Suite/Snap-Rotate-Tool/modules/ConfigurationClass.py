@@ -57,7 +57,7 @@ class Configuration:
 			valid_certificate = self.form_dialog.getDataYesOrNo("\nDo you want the certificate for SSL/TLS communication to be validated?", "Certificate Validation")
 			if valid_certificate == "ok":
 				data_conf.append(True)
-				cert_file = self.form_dialog.getFile("/etc/Snap-Rotate-Suite/Snap-Rotate", "Select the CA certificate:")
+				cert_file = self.form_dialog.getFile("/etc/Snap-Rotate-Suite/Snap-Rotate", "Select the CA certificate:", ".pem")
 				data_conf.append(cert_file)
 			else:
 				data_conf.append(False)
@@ -215,13 +215,13 @@ class Configuration:
 								data_conf['valid_certificate'] = False
 								del data_conf['path_certificate']
 							elif opt_valid_cert_true == "Certificate File":
-								cert_file = self.form_dialog.getFile(data_conf['path_certificate'], "Select the CA certificate:")
+								cert_file = self.form_dialog.getFile(data_conf['path_certificate'], "Select the CA certificate:", ".pem")
 								data_conf['path_certificate'] = cert_file
 						else:
 							opt_valid_cert_false = self.form_dialog.getDataRadioList("Select a option:", options_valid_cert_false, "Certificate Validation")
 							if opt_valid_cert_false == "Enable":
 								data_conf['valid_certificate'] = True
-								cert_file = self.form_dialog.getFile('/etc/Snap-Rotate-Suite/Snap-Rotate', "Select the CA certificate:")
+								cert_file = self.form_dialog.getFile('/etc/Snap-Rotate-Suite/Snap-Rotate', "Select the CA certificate:", ".pem")
 								path_cert_json = { 'path_certificate' : cert_file }
 								data_conf.update(path_cert_json)
 				else:
@@ -230,7 +230,7 @@ class Configuration:
 						data_conf['use_ssl'] = True
 						valid_certificate = self.form_dialog.getDataYesOrNo("\nDo you want the certificate for SSL/TLS communication to be validated?", "Certificate Validation")
 						if valid_certificate == "ok":
-							cert_file = self.form_dialog.getFile('/etc/Snap-Rotate-Suite/Snap-Rotate', "Select the CA certificate:")
+							cert_file = self.form_dialog.getFile('/etc/Snap-Rotate-Suite/Snap-Rotate', "Select the CA certificate:", ".pem")
 							valid_cert_json = { 'valid_certificate' : True, 'path_certificate' : cert_file }
 						else:
 							valid_cert_json = { 'valid_certificate' : False}

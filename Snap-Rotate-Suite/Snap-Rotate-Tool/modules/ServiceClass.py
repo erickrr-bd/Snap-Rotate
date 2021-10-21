@@ -3,8 +3,7 @@ from os import system, path, remove
 from modules.UtilsClass import Utils
 
 """
-Class that manages everything related to the Snap-Rotate
-service.
+Class that manages everything related to the Snap-Rotate service.
 """
 class Service:
 	"""
