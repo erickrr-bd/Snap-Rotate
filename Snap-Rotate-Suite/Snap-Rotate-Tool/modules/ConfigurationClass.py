@@ -2,18 +2,16 @@ from os import path
 from modules.UtilsClass import Utils
 
 """
-Class that manages everything related to the Inv-Alert
-configuration.
+Class that manages everything related to the Snap-Rotate configuration.
 """
 class Configuration:
 	"""
-	Property that stores an object of type FormDialogs.
+	Property that stores an object of type FormDialog.
 	"""
 	form_dialog = None
 
 	"""
-	Property that stores the path of the configuration
-	file.
+	Property that stores the path of the configuration file.
 	"""
 	conf_file = None
 
@@ -23,8 +21,7 @@ class Configuration:
 	utils = None
 
 	"""
-	Property that stores the list that contains the types
-	of snapshots
+	Property that stores the list that contains the types of snapshots
 	"""
 	options_type_snapshot = [["Only", "All indexes in a snapshot", 0],
 							 ["Multiple", "One snapshot per index", 0]]
@@ -33,8 +30,7 @@ class Configuration:
 	Constructor for the Configuration class.
 
 	Parameters:
-	self -- An instantiated object of the Configuration
-			class.
+	self -- An instantiated object of the Configuration class.
 	"""
 	def __init__(self, form_dialog):
 		self.form_dialog = form_dialog
