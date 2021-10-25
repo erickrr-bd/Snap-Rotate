@@ -3,7 +3,6 @@ from datetime import datetime
 from pycurl import Curl, HTTP_CODE
 from urllib.parse import urlencode
 from modules.UtilsClass import Utils
-from modules.LoggerClass import Logger
 
 """
 Class that allows you to manage the sending of alerts through Telegram.
@@ -15,19 +14,13 @@ class Telegram:
 	utils = None
 
 	"""
-	Property that stores an object of type Logger.
-	"""
-	logger = None
-
-	"""
 	Constructor for the Telegram class.
 
 	Parameters:
 	self -- An instantiated object of the Telegram class.
 	"""
-	def __init__(self, form_dialog):
-		self.logger = Logger()
-		self.utils = Utils(form_dialog)
+	def __init__(self):
+		self.utils = Utils()
 
 	"""
 	Method that sends the alert to the telegram channel.

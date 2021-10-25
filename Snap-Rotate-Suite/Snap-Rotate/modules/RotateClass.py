@@ -47,7 +47,7 @@ class Rotate:
 					last_day_month = monthrange(now.year, now.month)[1]
 					if now.day == last_day_month and (now.hour == int(time_execute[0]) and now.minute == int(time_execute[1])):
 						months = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-						month = months[now.month - 2]
+						month = months[now.month - 1]
 						name_repository = "Snap_Rotate_" + month + '_' + str(now.year)
 						elastic = Elastic(snap_rotate_conf)
 						conn_es = elastic.getConnectionElastic()
@@ -60,12 +60,12 @@ class Rotate:
 						if not len(list_indices_not_writeables) == 0:
 							self.utils.createSnapRotateLog("Repository creation has started: " + name_repository, 1)
 							print("\nRepository creation has started: " + name_repository)
-							elastic.createRepositorySnapshot(conn_es, name_repository, snap_rotate_conf['repo_path'] + '/' + name_repository)
+							elastic.createRepositorySnapshot(conn_es, name_repository, snap_rotate_conf['repo_path'] + name_repository)
 							self.utils.createSnapRotateLog("Repository created: " + name_repository, 1)
 							print("\nRepository created: " + name_repository)
 							telegram = Telegram()
 							message_end_repo = telegram.getMessageEndCreationRepository(name_repository, snap_rotate_conf['repo_path'] + '/' + name_repository)
-							telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_end_repo)
+							telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_end_repo)
 							if snap_rotate_conf['type_snapshot'] == "Only":
 								print("\nThe following indices will be stored in the snapshot:\n")
 								print('\n'.join(list_indices_not_writeables))
@@ -74,7 +74,7 @@ class Rotate:
 								self.utils.createSnapRotateLog("Snapshot creation has started: " + name_repository.lower(), 1)
 								print("\nSnapshot creation has started: " + name_repository.lower())
 								message_creation_start = telegram.getMessageStartCreationSnapshot(indices_to_snapshot, name_repository.lower(), name_repository)
-								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_creation_start)
+								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_creation_start)
 								elastic.createSnapshot(conn_es, name_repository, name_repository.lower(), indices_to_snapshot)
 								while True:
 									status_snapshot = elastic.getStatusSnapshot(conn_es, name_repository, name_repository.lower())
@@ -85,7 +85,7 @@ class Rotate:
 								self.utils.createSnapRotateLog("Snapshot created: " + name_repository.lower(), 1)
 								print("\nSnapshot created: " + name_repository.lower())
 								message_creation_end = telegram.getMessageEndSnapshot(name_repository.lower(), name_repository, snapshot_info['snapshots'][0]['start_time'], snapshot_info['snapshots'][0]['end_time'])
-								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_creation_end)
+								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_creation_end)
 								if snap_rotate_conf['delete_index'] == True:
 									print("\nThe backed up index(s) will be deleted...")
 									elastic.deleteIndex(conn_es, indices_to_snapshot)
@@ -93,14 +93,14 @@ class Rotate:
 										self.utils.createSnapRotateLog("Indices removed: " + indices_to_snapshot, 1)
 										print("\nIndices removed: " + indices_to_snapshot)
 										message_delete_index = telegram.getMessageDeleteIndex(indices_to_snapshot)
-										telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_delete_index)
+										telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_delete_index)
 							elif snap_rotate_conf['type_snapshot'] == "Multiple":
 								print("\nThe following indices will be stored in the snapshots:\n")
 								print('\n'.join(list_indices_not_writeables))
 								for index in list_indices_not_writeables:
 									print("\nSnapshot creation has started: " + index)
 									message_creation_start = telegram.getMessageStartCreationSnapshot(index, index, name_repository)
-									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_creation_start)
+									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_creation_start)
 									elastic.createSnapshot(conn_es, name_repository, index, index)
 									while True:
 										status_snapshot = elastic.getStatusSnapshot(conn_es, name_repository, index)
@@ -111,7 +111,7 @@ class Rotate:
 									self.utils.createSnapRotateLog("Snapshot created: " + index, 1)
 									print("\nSnapshot created: " + index)
 									message_creation_end = telegram.getMessageEndSnapshot(index, name_repository, snapshot_info['snapshots'][0]['start_time'], snapshot_info['snapshots'][0]['end_time'])
-									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_creation_end)
+									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_creation_end)
 									if snap_rotate_conf['delete_index'] == True:
 										print("\nThe backed up index(s) will be deleted...")
 										elastic.deleteIndex(conn_es, index)
@@ -119,7 +119,7 @@ class Rotate:
 											self.utils.createSnapRotateLog("Index removed: " + index, 1)
 											print("\nIndex removed: " + index)
 											message_delete_index = telegram.getMessageDeleteIndex(indices_to_snapshot)
-											telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_delete_index)
+											telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_delete_index)
 							conn_es.transport.close()
 							if snap_rotate_conf['compress_repo'] == True:
 								print("\nCompression of the repository has started...")
@@ -128,7 +128,7 @@ class Rotate:
 								self.utils.createSnapRotateLog("The repository has been compressed: " + name_repository, 1)
 								print("\nThe repository has been compressed: " + name_repository)
 								message_compress_repo = telegram.getMessageCompressFile(snap_rotate_conf['repo_path'] + '/' + name_repository + '.tar.gz')
-								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), message_compress_repo)
+								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_compress_repo)
 						else:
 							self.utils.createSnapRotateLog("There are no indexes to back up", 2)
 							print("\nThere are no indexes to back up.")
