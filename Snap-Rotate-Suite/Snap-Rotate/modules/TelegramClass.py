@@ -92,7 +92,7 @@ class Telegram:
 		message = self.getHeaderMessage()
 		message += u'\u2611\uFE0F' + " Action: Repository creation finished\n"
 		message += u'\u2611\uFE0F' + " Repository name: " + repository_name + '\n'
-		message += u'\u2611\uFE0F' + " Repository name: " + path_repository
+		message += u'\u2611\uFE0F' + " Repository path: " + path_repository
 		return message
 
 	"""

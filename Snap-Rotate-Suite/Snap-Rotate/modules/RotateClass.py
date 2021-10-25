@@ -60,7 +60,7 @@ class Rotate:
 						if not len(list_indices_not_writeables) == 0:
 							self.utils.createSnapRotateLog("Repository creation has started: " + name_repository, 1)
 							print("\nRepository creation has started: " + name_repository)
-							elastic.createRepositorySnapshot(conn_es, name_repository, snap_rotate_conf['repo_path'] + name_repository)
+							elastic.createRepositorySnapshot(conn_es, name_repository, snap_rotate_conf['repo_path'] + '/' + name_repository)
 							self.utils.createSnapRotateLog("Repository created: " + name_repository, 1)
 							print("\nRepository created: " + name_repository)
 							telegram = Telegram()
