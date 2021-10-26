@@ -73,6 +73,7 @@ class Configuration:
 		else:
 			data_conf.append(False)
 		repo_path = self.form_dialog.getDirectory("/etc/Snap-Rotate-Suite", "Repositories Path")
+		repo_path = repo_path.rstrip('/')
 		data_conf.append(repo_path)
 		time_rotate = self.form_dialog.getDataTime("Choose the time the snapshot will be created:", -1, -1)
 		data_conf.append(str(time_rotate[0]) + ':' + str(time_rotate[1]))

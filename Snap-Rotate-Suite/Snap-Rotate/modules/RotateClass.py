@@ -1,3 +1,4 @@
+from os import path
 from sys import exit
 from time import sleep
 from datetime import datetime
@@ -123,12 +124,14 @@ class Rotate:
 							conn_es.transport.close()
 							if snap_rotate_conf['compress_repo'] == True:
 								print("\nCompression of the repository has started...")
-								with open_tf(snap_rotate_conf['repo_path'] + '/' + name_repository + '.tar.gz', "w:gz") as tar_file:
+								path_repo = snap_rotate_conf['repo_path'] + '/' + name_repository + '.tar.gz'
+								with open_tf(path_repo, "w:gz") as tar_file:
 									tar_file.add(snap_rotate_conf['repo_path'] + '/' + name_repository)
-								self.utils.createSnapRotateLog("The repository has been compressed: " + name_repository, 1)
-								print("\nThe repository has been compressed: " + name_repository)
-								message_compress_repo = telegram.getMessageCompressFile(snap_rotate_conf['repo_path'] + '/' + name_repository + '.tar.gz')
-								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_compress_repo)
+								if path.exists(path_repo):
+									self.utils.createSnapRotateLog("The repository has been compressed: " + name_repository, 1)
+									print("\nThe repository has been compressed: " + name_repository)
+									message_compress_repo = telegram.getMessageCompressFile(name_repository, path_repo)
+									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_conf['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_conf['telegram_bot_token']).decode('utf-8'), message_compress_repo)
 						else:
 							self.utils.createSnapRotateLog("There are no indexes to back up", 2)
 							print("\nThere are no indexes to back up.")

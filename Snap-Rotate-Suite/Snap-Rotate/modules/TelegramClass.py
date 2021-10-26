@@ -138,14 +138,16 @@ class Telegram:
 	
 	Parameters:
 	self -- An instantiated object of the Telegram class.
+	repository_name -- Name of the compressed repository.
 	path_compress_file -- Path of the resulting compressed file.
 
 	Return:
 	message -- Message to send.
 	"""
-	def getMessageCompressFile(self, path_compress_file):
+	def getMessageCompressFile(self, repository_name, path_compress_file):
 		message = self.getHeaderMessage()
 		message += u'\u2611\uFE0F' + " Action: Repository compressed into a file\n"
+		message += u'\u2611\uFE0F' + " Repository name: " + repository_name + '\n'
 		message += u'\u2611\uFE0F' + " Path of the compressed file: " + path_compress_file
 		return message
 	
