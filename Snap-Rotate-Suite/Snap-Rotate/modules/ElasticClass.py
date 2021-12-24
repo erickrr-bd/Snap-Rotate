@@ -41,7 +41,7 @@ class Elastic:
 
 	Exceptions:
 	KeyError -- A Python KeyError exception is what is raised when you try to access a key that isn’t in a dictionary (dict). 
-	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES. 
+	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES. 
 	exceptions.AuthenticationException -- Exception representing a 401 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	InvalidURL -- The URL provided was somehow invalid.
@@ -107,6 +107,74 @@ class Elastic:
 			return conn_es
 
 	"""
+	Method that creates the repository for snapshots.
+
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to ElasticSearch.
+	repository_name -- Name of the repository.
+	path_repository -- Repository path.
+
+	Exceptions:
+	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES. 
+	"""
+	def createRepositoryFS(self, conn_es, repository_name, path_repository):
+		try:
+			conn_es.snapshot.create_repository(repository = repository_name, body = { "type": "fs", "settings": { "location": path_repository, "compress" : True }})
+		except (exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nError creating repository. For more information, see the logs.")
+			exit(1)
+
+	"""
+	Method that creates a snapshot.
+
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to ElasticSearch.
+	repository_name -- Name of the repository.
+	snapshot_name --  Name of the snapshot.
+	indices -- List with the names of the indices that will be saved in the snapshot.
+
+	Exceptions:
+	exceptions.RequestError -- Exception representing a 400 status code.
+	exceptions.NotFoundError -- Exception representing a 404 status code.
+	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES.
+	"""
+	def createSnapshot(self, conn_es, repository_name, snapshot_name, indices):
+		try:
+			conn_es.snapshot.create(repository = repository_name,
+									snapshot = snapshot_name,
+									body = { "indices" : indices, "include_global_state" : False },
+									wait_for_completion = False)
+		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nFailed to create snapshot. For more information, see the logs.")
+			exit(1)
+
+	"""
+	Method that removes an index.
+
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to ElasticSearch.
+	index_name -- ElasticSearch index name.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404 status code.
+	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES. 
+	"""
+	def deleteIndex(self, conn_es, index_name):
+		try:
+			conn_es.indices.delete(index = index_name)
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+			self.utils.createSnapRotateLog(exception, 3)
+			print("\nFailed to delete index. For more information, see the logs.")
+
+	"""
 	Method that gets all the names of the allowed indexes.
 
 	Parameters:
@@ -119,13 +187,14 @@ class Elastic:
 	Exceptions:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES.
 	"""
 	def getIndicesElastic(self, conn_es):
 		try:
 			list_all_indices = []
 			list_all_indices = conn_es.indices.get(index = '*')
 			list_all_indices = sorted([index for index in list_all_indices if not index.startswith('.')])
-		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nError getting the indices. For more information, see the logs.")
 		else:
@@ -145,6 +214,7 @@ class Elastic:
 	Exceptions:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES. 
 	"""
 	def getIsWriteableIndex(self, conn_es, index_name):
 		try:
@@ -152,77 +222,11 @@ class Elastic:
 			aux_var = info[index_name]['aliases']
 			for aux in aux_var:
 				is_writeable_index = info[index_name]['aliases'][aux]['is_write_index']
-		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nError getting index information. For more information, see the logs.")
 		else:
 			return is_writeable_index
-
-	"""
-	Method that removes an index.
-
-	Parameters:
-	self -- An instantiated object of the Elastic class.
-	conn_es -- Object that contains the connection to ElasticSearch.
-	index_name -- ElasticSearch index name.
-
-	Exceptions:
-	exceptions.NotFoundError -- Exception representing a 404 status code.
-	exceptions.AuthorizationException -- Exception representing a 403 status code.
-	"""
-	def deleteIndex(self, conn_es, index_name):
-		try:
-			conn_es.indices.delete(index = index_name)
-		except (exceptions.AuthorizationException, exceptions.NotFoundError)  as exception:
-			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to delete index. For more information, see the logs.")
-
-	"""
-	Method that creates the repository for snapshots.
-
-	Parameters:
-	self -- An instantiated object of the Elastic class.
-	conn_es -- Object that contains the connection to ElasticSearch.
-	repository_name -- Name of the repository.
-	path_repository -- Repository path.
-
-	Exceptions:
-	exceptions.AuthorizationException -- Exception representing a 403 status code.
-	"""
-	def createRepositorySnapshot(self, conn_es, repository_name, path_repository):
-		try:
-			conn_es.snapshot.create_repository(repository = repository_name,
-											   body = { "type": "fs", "settings": { "location": path_repository, "compress" : True }})
-		except (exceptions.AuthorizationException) as exception:
-			self.utils.createSnapRotateLog(exception, 3)
-			print("\nError creating repository. For more information, see the logs.")
-			exit(1)
-
-	"""
-	Method that creates a snapshot.
-
-	Parameters:
-	self -- An instantiated object of the Elastic class.
-	conn_es -- Object that contains the connection to ElasticSearch.
-	repository_name -- Name of the repository.
-	snapshot_name --  Name of the snapshot.
-	indices -- List with the names of the indices that will be saved in the snapshot.
-
-	Exceptions:
-	exceptions.RequestError -- Exception representing a 400 status code.
-	exceptions.NotFoundError -- Exception representing a 404 status code.
-	exceptions.AuthorizationException -- Exception representing a 403 status code.
-	"""
-	def createSnapshot(self, conn_es, repository_name, snapshot_name, indices):
-		try:
-			conn_es.snapshot.create(repository = repository_name,
-									snapshot = snapshot_name,
-									body = { "indices" : indices, "include_global_state" : False },
-									wait_for_completion = False)
-		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException) as exception:
-			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to create snapshot. For more information, see the logs.")
-			exit(1)
 
 	"""
 	Method that obtains the current status of a snapshot.
@@ -238,13 +242,13 @@ class Elastic:
 
 	Exceptions:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
+	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES.
 	"""
 	def getStatusSnapshot(self, conn_es, repository_name, snapshot_name):
 		try:
-			info_snapshot = conn_es.snapshot.status(repository = repository_name,
-													snapshot = snapshot_name)
+			info_snapshot = conn_es.snapshot.status(repository = repository_name, snapshot = snapshot_name)
 			status_snapshot = info_snapshot['snapshots'][0]['state']
-		except (exceptions.NotFoundError) as exception:
+		except (exceptions.NotFoundError, exceptions.ConnectionError) as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nFailed to create snapshot. For more information, see the logs.")
 		else:
@@ -264,12 +268,12 @@ class Elastic:
 	Exceptions:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES.
 	"""
 	def getSnapshotInfo(self, conn_es, repository_name, snapshot_name):
 		try:
-			snapshot_info = conn_es.snapshot.get(repository = repository_name,
-												 snapshot = snapshot_name)
-		except (exceptions.NotFoundError, exceptions.AuthorizationException) as exception:
+			snapshot_info = conn_es.snapshot.get(repository = repository_name, snapshot = snapshot_name)
+		except (exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nFailed to get snapshot status. For more information, see the logs.")
 		else:
