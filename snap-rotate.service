@@ -1,11 +1,12 @@
 [Unit]
-Description=Tekium Snap-Rotate v3.0 Service
+Description=Snap-Rotate v3.1 Service
 After=networking.target
 StartLimitIntervalSec=0
 
 [Service]
 Type=simple
 ExecStart=/etc/Snap-Rotate-Suite/Snap-Rotate/Snap_Rotate.py
+User=snap_rotate
 Restart=on-failure
 RestartSec=1
 

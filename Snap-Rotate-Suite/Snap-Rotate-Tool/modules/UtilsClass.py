@@ -2,6 +2,7 @@ from pwd import getpwnam
 from datetime import date
 from Crypto import Random
 from hashlib import sha256
+from binascii import Error
 from Crypto.Cipher import AES
 from os import path, chown, mkdir
 from yaml import safe_load, safe_dump
@@ -34,31 +35,6 @@ class Utils:
 		self.passphrase = self.getPassphrase()
 
 	"""
-	Method that defines a directory based on the main Snap-Rotate directory.
-
-	Parameters:
-	self -- An instantiated object of the Utils class.
-	path_dir -- Directory that is added to the main Snap-Rotate directory.
-
-	Return:
-	path_final -- Defined final path.
-
-	Exceptions:
-	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
-	TypeError -- Raised when an operation or function is applied to an object of inappropriate type. The associated value is a string giving details about the type mismatch.
-	"""
-	def getPathSnapRotate(self, path_dir):
-		path_main = "/etc/Snap-Rotate-Suite/Snap-Rotate"
-		try:
-			path_final = path.join(path_main, path_dir)
-		except (OSError, TypeError) as exception:
-			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nAn error has occurred. For more information, see the logs.", 8, 50, title = "Error Message")
-			self.form_dialog.mainMenu()
-		else:
-			return path_final
-
-	"""
 	Method that creates a YAML file.
 
 	Parameters:
@@ -77,7 +53,7 @@ class Utils:
 			self.ownerChange(path_file_yaml)
 		except IOError as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nError creating YAML file. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nError creating YAML file. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 
 	"""
@@ -100,9 +76,35 @@ class Utils:
 				data_file_yaml = safe_load(file_yaml)
 		except IOError as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			print("\nError opening or reading the YAML file. For more information, see the logs.")
+			self.form_dialog.d.msgbox(text = "\nError opening or reading the YAML file. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
+			self.form_dialog.mainMenu()
 		else:
 			return data_file_yaml
+
+	"""
+	Method that defines a directory based on the main Snap-Rotate directory.
+
+	Parameters:
+	self -- An instantiated object of the Utils class.
+	path_dir -- Directory that is added to the main Snap-Rotate directory.
+
+	Return:
+	path_final -- Defined final path.
+
+	Exceptions:
+	OSError -- This exception is raised when a system function returns a system-related error, including I/O failures such as “file not found” or “disk full” (not for illegal argument types or other incidental errors).
+	TypeError -- Raised when an operation or function is applied to an object of inappropriate type. The associated value is a string giving details about the type mismatch.
+	"""
+	def getPathSnapRotate(self, path_dir):
+		path_main = "/etc/Snap-Rotate-Suite/Snap-Rotate"
+		try:
+			path_final = path.join(path_main, path_dir)
+		except (OSError, TypeError) as exception:
+			self.createSnapRotateToolLog(exception, 3)
+			self.form_dialog.d.msgbox(text = "\nAn error has occurred. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
+			self.form_dialog.mainMenu()
+		else:
+			return path_final
 
 	"""
 	Method that obtains the passphrase used for the process of encrypting and decrypting a file.
@@ -123,7 +125,7 @@ class Utils:
 			file_key.close()
 		except FileNotFoundError as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nError opening or reading the Key file. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nError opening or reading the Key file. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
 			return pass_key
@@ -145,7 +147,7 @@ class Utils:
 			chown(path_to_change, uid, gid)
 		except OSError as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nFailed to change owner path. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nFailed to change owner path. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 
 	"""
@@ -185,7 +187,7 @@ class Utils:
 					hash_sha.update(block)
 		except IOError as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nError getting the file's hash function. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nError getting the file's hash function. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
 			return hash_sha.hexdigest()
@@ -211,7 +213,7 @@ class Utils:
 			aes = AES.new(key, AES.MODE_CBC, IV)
 		except Exception as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nFailed to encrypt the data. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nFailed to encrypt the data. For more information, see the logs.", width = 8, height = 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
 			return b64encode(IV + aes.encrypt(pad(text_bytes, AES.block_size)))
@@ -227,7 +229,7 @@ class Utils:
 	Character string with decrypted text.
 
 	Exceptions:
-	binascii.Error -- Is raised if were incorrectly padded or if there are non-alphabet characters present in the string. 
+	Error -- Is raised if were incorrectly padded or if there are non-alphabet characters present in the string. 
 	"""
 	def decryptAES(self, text_encrypt):
 		try:
@@ -235,9 +237,9 @@ class Utils:
 			text_encrypt = b64decode(text_encrypt)
 			IV = text_encrypt[:AES.block_size]
 			aes = AES.new(key, AES.MODE_CBC, IV)
-		except binascii.Error as exception:
+		except Error as exception:
 			self.createSnapRotateToolLog(exception, 3)
-			self.form_dialog.d.msgbox("\nFailed to decrypt the data. For more information, see the logs.", 8, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nFailed to decrypt the data. For more information, see the logs.", height = 8, width = 50, title = "Error Message")
 			self.form_dialog.mainMenu()
 		else:
 			return unpad(aes.decrypt(text_encrypt[AES.block_size:]), AES.block_size)

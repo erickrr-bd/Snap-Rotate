@@ -36,10 +36,10 @@ class Service:
 		result = system("systemctl start snap-rotate.service")
 		if int(result) == 0:
 			self.utils.createSnapRotateToolLog("Snap-Rotate service started", 1)
-			self.form_dialog.d.msgbox("\nSnap-Rotate service started.", 7, 50, title = "Notification Message")
+			self.form_dialog.d.msgbox(text = "\nSnap-Rotate service started.", height = 7, width = 50, title = "Notification Message")
 		if int(result) == 1280:
 			self.utils.createSnapRotateToolLog("Failed to start snap-rotate.service. Service not found.", 3)
-			self.form_dialog.d.msgbox("\nFailed to start snap-rotate.service. Service not found.", 7, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nFailed to start snap-rotate.service. Service not found.", height = 8, width = 50, title = "Error Message")
 		self.form_dialog.mainMenu()
 			
 	"""
@@ -52,10 +52,10 @@ class Service:
 		result = system("systemctl restart snap-rotate.service")
 		if int(result) == 0:
 			self.utils.createSnapRotateToolLog("Snap-Rotate service restarted", 1)
-			self.form_dialog.d.msgbox("\nSnap-Rotate service restarted.", 7, 50, title = "Notification Message")
+			self.form_dialog.d.msgbox(text = "\nSnap-Rotate service restarted.", height = 7, width = 50, title = "Notification Message")
 		if int(result) == 1280:
 			self.utils.createSnapRotateToolLog("Failed to restart snap-rotate.service. Service not found.", 3)
-			self.form_dialog.d.msgbox("\nFailed to restart snap-rotate.service. Service not found", 7, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nFailed to restart snap-rotate.service. Service not found", height = 8, width = 50, title = "Error Message")
 		self.form_dialog.mainMenu()
 
 	"""
@@ -68,10 +68,10 @@ class Service:
 		result = system("systemctl stop snap-rotate.service")
 		if int(result) == 0:
 			self.utils.createSnapRotateToolLog("Snap-Rotate service stopped", 1)
-			self.form_dialog.d.msgbox("\nSnap-Rotate service stopped.", 7, 50, title = "Notification Message")	
+			self.form_dialog.d.msgbox(text = "\nSnap-Rotate service stopped.", height = 7, width = 50, title = "Notification Message")	
 		if int(result) == 1280:
 			self.utils.createSnapRotateToolLog("Failed to stop snap-rotate.service: Service not found", 3)
-			self.form_dialog.d.msgbox("\nFailed to stop snap-rotate.service. Service not found.", 7, 50, title = "Error Message")
+			self.form_dialog.d.msgbox(text = "\nFailed to stop snap-rotate.service. Service not found.", height = 8, width = 50, title = "Error Message")
 		self.form_dialog.mainMenu()
 
 	"""
@@ -88,3 +88,4 @@ class Service:
 		system('systemctl -l status snap-rotate.service >> /tmp/snap_rotate.status')
 		with open_io('/tmp/snap_rotate.status', 'r', encoding = 'utf-8') as file_status:
 			self.form_dialog.getScrollBox(file_status.read(), title = "Status Service")
+		self.form_dialog.mainMenu()
