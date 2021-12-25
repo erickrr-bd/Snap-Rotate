@@ -89,9 +89,9 @@ elif [ $opc = "U" ] || [ $opc = "u" ]; then
 	dir=$(sudo pwd)
 	cp -r Snap-Rotate-Suite /etc/
 	chown snap_rotate:snap_rotate -R /etc/Snap-Rotate-Suite
-	cp snap-rotate.service /etc/systemd/system/
-	systemctl daemon-reload
-	rm -rf /etc/Snap-Rotate-Suite/Snap-Rotate/conf/snap_rotate_conf.yaml
+	#cp snap-rotate.service /etc/systemd/system/
+	#systemctl daemon-reload
+	#rm -rf /etc/Snap-Rotate-Suite/Snap-Rotate/conf/snap_rotate_conf.yaml
 	sleep 3
 	echo -e '\e[96mSnap-Rotate updated...\e[0m'
 	echo ''

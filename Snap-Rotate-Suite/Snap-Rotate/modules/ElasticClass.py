@@ -145,10 +145,7 @@ class Elastic:
 	"""
 	def createSnapshot(self, conn_es, repository_name, snapshot_name, indices):
 		try:
-			conn_es.snapshot.create(repository = repository_name,
-									snapshot = snapshot_name,
-									body = { "indices" : indices, "include_global_state" : False },
-									wait_for_completion = False)
+			conn_es.snapshot.create(repository = repository_name, snapshot = snapshot_name, body = { "indices" : indices, "include_global_state" : False }, wait_for_completion = False)
 		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
 			self.utils.createSnapRotateLog(exception, 3)
 			print("\nFailed to create snapshot. For more information, see the logs.")
