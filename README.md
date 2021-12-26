@@ -1,4 +1,4 @@
-# Snap-Rotate v3.0
+# Snap-Rotate v3.1
 
 Author: Erick Rodríguez 
 
