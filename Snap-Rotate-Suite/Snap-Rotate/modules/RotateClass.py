@@ -36,19 +36,19 @@ class Rotate:
 		path_configuration_file = self.utils.getPathSnapRotate("conf") + "/snap_rotate_conf.yaml"
 		try:
 			if path.exists(path_configuration_file):
-				snap_rotate_configurationiguration = self.utils.readYamlFile(path_configuration_file, 'r')
-				if float(snap_rotate_configurationiguration['es_version']) >= 7.0 and float(snap_rotate_configurationiguration['es_version']) <= 7.16:
+				snap_rotate_configuration = self.utils.readYamlFile(path_configuration_file, 'r')
+				if float(snap_rotate_configuration['es_version']) >= 7.0 and float(snap_rotate_configuration['es_version']) <= 7.16:
 					print("Snap-Rotate v3.1")
 					print("@2021 Tekium. All rights reserved.")
 					print("Author: Erick Rodriguez")
 					print("Email: erodriguez@tekium.mx, erickrr.tbd93@gmail.com")
 					print("License: GPLv3")
 					print("\nSnap-Rotate started...")
-					time_execution_rotate = snap_rotate_configurationiguration['time_execution_rotate'].split(':')
+					time_execution_rotate = snap_rotate_configuration['time_execution_rotate'].split(':')
 					while True:
 						now = datetime.now()
 						if now.hour == int(time_execution_rotate[0]) and now.minute == int(time_execution_rotate[1]):
-							elastic = Elastic(snap_rotate_configurationiguration)
+							elastic = Elastic(snap_rotate_configuration)
 							telegram = Telegram()
 							months = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 							month = months[now.month - 1]
