@@ -33,7 +33,7 @@ class Rotate:
 	self -- An instantiated object of the Rotate class.
 	"""
 	def startSnapRotate(self):
-		path_configuration_file = self.utils.getPathSnapRotate("conf") + "/snap_rotate_configuration.yaml"
+		path_configuration_file = self.utils.getPathSnapRotate("conf") + "/snap_rotate_conf.yaml"
 		try:
 			if path.exists(path_configuration_file):
 				snap_rotate_configurationiguration = self.utils.readYamlFile(path_configuration_file, 'r')

@@ -17,18 +17,18 @@ class Elastic:
 	"""
 	Property that saves the data of the Snap-Rotate configuration file.
 	"""
-	snap_rotate_conf = None
+	snap_rotate_configuration = None
 
 	"""
 	Constructor for the Elastic class.
 
 	Parameters:
 	self -- An instantiated object of the Elastic class.
-	snap_rotate_conf -- Object that has the information from the Snap-Rotate configuration file.
+	snap_rotate_configuration -- Object that has the information from the Snap-Rotate configuration file.
 	"""
-	def __init__(self, snap_rotate_conf):
+	def __init__(self, snap_rotate_configuration):
 		self.utils = Utils()
-		self.snap_rotate_conf = snap_rotate_conf
+		self.snap_rotate_configuration = snap_rotate_configuration
 		
 	"""
 	Method that creates a connection object with ElasticSearch.
@@ -49,53 +49,53 @@ class Elastic:
 	def getConnectionElastic(self):
 		conn_es = None
 		try:
-			if(not self.snap_rotate_conf['use_ssl'] == True) and (not self.snap_rotate_conf['use_http_auth'] == True):
-				conn_es = Elasticsearch(self.snap_rotate_conf['es_host'],
-										port = self.snap_rotate_conf['es_port'],
+			if(not self.snap_rotate_configuration['use_ssl_tls'] == True) and (not self.snap_rotate_configuration['use_http_authentication'] == True):
+				conn_es = Elasticsearch(self.snap_rotate_configuration['es_host'],
+										port = self.snap_rotate_configuration['es_port'],
 										connection_class = RequestsHttpConnection,
 										use_ssl = False)
-			if(not self.snap_rotate_conf['use_ssl'] == True) and self.snap_rotate_conf['use_http_auth'] == True:
-				conn_es = Elasticsearch(self.snap_rotate_conf['es_host'],
-										port = self.snap_rotate_conf['es_port'],
+			if(not self.snap_rotate_configuration['use_ssl_tls'] == True) and self.snap_rotate_configuration['use_http_authentication'] == True:
+				conn_es = Elasticsearch(self.snap_rotate_configuration['es_host'],
+										port = self.snap_rotate_configuration['es_port'],
 										connection_class = RequestsHttpConnection,
-										http_auth = (self.utils.decryptAES(self.snap_rotate_conf['http_auth_user']).decode('utf-8'), self.utils.decryptAES(self.snap_rotate_conf['http_auth_pass']).decode('utf-8')),
+										http_auth = (self.utils.decryptAES(self.snap_rotate_configuration['user_http_authentication']).decode('utf-8'), self.utils.decryptAES(self.snap_rotate_configuration['password_http_authentication']).decode('utf-8')),
 										use_ssl = False)
-			if self.snap_rotate_conf['use_ssl'] == True and (not self.snap_rotate_conf['use_http_auth'] == True):
-				if not self.snap_rotate_conf['valid_certificate']:
-					conn_es = Elasticsearch(self.snap_rotate_conf['es_host'],
-											port = self.snap_rotate_conf['es_port'],
+			if self.snap_rotate_configuration['use_ssl_tls'] == True and (not self.snap_rotate_configuration['use_http_authentication'] == True):
+				if not self.snap_rotate_configuration['validate_certificate_ssl']:
+					conn_es = Elasticsearch(self.snap_rotate_configuration['es_host'],
+											port = self.snap_rotate_configuration['es_port'],
 											connection_class = RequestsHttpConnection,
 											use_ssl = True,
 											verify_certs = False,
 											ssl_show_warn = False)
 				else:
-					context = create_default_context(cafile = self.snap_rotate_conf['path_certificate'])
-					conn_es = Elasticsearch(self.snap_rotate_conf['es_host'],
-											port = self.snap_rotate_conf['es_port'],
+					context = create_default_context(cafile = self.snap_rotate_configuration['path_certificate_file'])
+					conn_es = Elasticsearch(self.snap_rotate_configuration['es_host'],
+											port = self.snap_rotate_configuration['es_port'],
 											connection_class = RequestsHttpConnection,
 											use_ssl = True,
 											verify_certs = True,
 											ssl_context = context)
-			if self.snap_rotate_conf['use_ssl'] == True and self.snap_rotate_conf['use_http_auth'] == True:
-				if not self.snap_rotate_conf['valid_certificate'] == True:
-					conn_es = Elasticsearch(self.snap_rotate_conf['es_host'],
-											port = self.snap_rotate_conf['es_port'],
+			if self.snap_rotate_configuration['use_ssl_tls'] == True and self.snap_rotate_configuration['use_http_authentication'] == True:
+				if not self.snap_rotate_configuration['validate_certificate_ssl'] == True:
+					conn_es = Elasticsearch(self.snap_rotate_configuration['es_host'],
+											port = self.snap_rotate_configuration['es_port'],
 											connection_class = RequestsHttpConnection,
-											http_auth = (self.utils.decryptAES(self.snap_rotate_conf['http_auth_user']).decode('utf-8'), self.utils.decryptAES(self.snap_rotate_conf['http_auth_pass']).decode('utf-8')),
+											http_auth = (self.utils.decryptAES(self.snap_rotate_configuration['user_http_authentication']).decode('utf-8'), self.utils.decryptAES(self.snap_rotate_configuration['password_http_authentication']).decode('utf-8')),
 											use_ssl = True,
 											verify_certs = False,
 											ssl_show_warn = False)
 				else:
-					context = create_default_context(cafile = self.snap_rotate_conf['path_certificate'])
-					conn_es = Elasticsearch(self.snap_rotate_conf['es_host'],
-											port = self.snap_rotate_conf['es_port'],
+					context = create_default_context(cafile = self.snap_rotate_configuration['path_certificate_file'])
+					conn_es = Elasticsearch(self.snap_rotate_configuration['es_host'],
+											port = self.snap_rotate_configuration['es_port'],
 											connection_class = RequestsHttpConnection,
-											http_auth = (self.utils.decryptAES(self.snap_rotate_conf['http_auth_user']).decode('utf-8'), self.utils.decryptAES(self.snap_rotate_conf['http_auth_pass']).decode('utf-8')),
+											http_auth = (self.utils.decryptAES(self.snap_rotate_configuration['user_http_authentication']).decode('utf-8'), self.utils.decryptAES(self.snap_rotate_configuration['password_http_authentication']).decode('utf-8')),
 											use_ssl = True,
 											verify_certs = True,
 											ssl_context = context)
 			if not conn_es == None:
-				self.utils.createSnapRotateLog("Established connection with: " + self.snap_rotate_conf['es_host'] + ':' + str(self.snap_rotate_conf['es_port']), 1)
+				self.utils.createSnapRotateLog("Established connection with: " + self.snap_rotate_configuration['es_host'] + ':' + str(self.snap_rotate_configuration['es_port']), 1)
 				print("\nCONNECTION DATA:\n")
 				print("Cluster name: " + conn_es.info()['cluster_name'])
 				print("Elasticsearch version: " + conn_es.info()['version']['number'])
