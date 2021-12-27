@@ -54,6 +54,12 @@ class Rotate:
 							month = months[now.month - 1]
 							name_repository = "Snap_Rotate_" + month + '_' + str(now.year)
 							conn_es = elastic.getConnectionElastic()
+							if now.day == 1:
+								elastic.createRepositoryFS(conn_es, name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
+								self.utils.createSnapRotateLog("\nRepository created: " + name_repository, 1)
+								print("\nRepository created: " + name_repository)
+								message_creation_end_repository = telegram.getMessageEndCreationRepository(name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
+								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_end_repository)
 							list_all_indices = elastic.getIndicesElastic(conn_es)
 							list_indices_not_writeables = []
 							for index in list_all_indices:
@@ -61,11 +67,6 @@ class Rotate:
 								if is_writeable_index == False:
 									list_indices_not_writeables.append(index)
 							if not len(list_indices_not_writeables) == 0:
-								elastic.createRepositoryFS(conn_es, name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
-								self.utils.createSnapRotateLog("\nRepository created: " + name_repository, 1)
-								print("\nRepository created: " + name_repository)
-								message_creation_end_repository = telegram.getMessageEndCreationRepository(name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
-								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_end_repository)
 								for index in list_indices_not_writeables:
 									print("\nSnapshot creation has started: " + index)
 									message_creation_start_snapshot = telegram.getMessageStartCreationSnapshot(index, index, name_repository)
