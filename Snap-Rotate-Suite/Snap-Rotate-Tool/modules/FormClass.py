@@ -335,7 +335,7 @@ class FormDialog:
 	self -- An instantiated object of the FormDialog class.
 	"""
 	def getAbout(self):
-		message = "\nCopyright@2021 Tekium. All rights reserved.\nSnap-Rotate v3.1\nAuthor: Erick Rodriguez\nEmail: erickrr.tbd93@gmail.com, erodriguez@tekium.mx\n" + "License: GPLv3\n\nSnap-Rotate is an application that creates a repository per month\nin ElasticSearch and there it stores the snapshots of certain\nindexes, to finally compress it into a file that can be copied to\nanother directory."
+		message = "\nCopyright@2022 Tekium. All rights reserved.\nSnap-Rotate v3.1\nAuthor: Erick Rodriguez\nEmail: erickrr.tbd93@gmail.com, erodriguez@tekium.mx\n" + "License: GPLv3\n\nSnap-Rotate is an application that creates a repository per month\nin ElasticSearch and there it stores the snapshots of certain\nindexes, to finally compress it into a file that can be copied to\nanother directory."
 		self.getScrollBox(message, "About")
 		self.mainMenu()
 

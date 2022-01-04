@@ -57,7 +57,7 @@ class Rotate:
 							is_exists_repository = elastic.getExistsRespositoryFS(conn_es, name_repository)
 							if is_exists_repository == False:
 								elastic.createRepositoryFS(conn_es, name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
-								self.utils.createSnapRotateLog("\nRepository created: " + name_repository, 1)
+								self.utils.createSnapRotateLog("Repository created: " + name_repository, 1)
 								message_creation_end_repository = telegram.getMessageEndCreationRepository(name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
 								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_end_repository)
 							list_all_indices = elastic.getIndicesElastic(conn_es)
