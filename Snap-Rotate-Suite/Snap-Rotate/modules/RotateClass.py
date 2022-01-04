@@ -38,12 +38,12 @@ class Rotate:
 			if path.exists(path_configuration_file):
 				snap_rotate_configuration = self.utils.readYamlFile(path_configuration_file, 'r')
 				if float(snap_rotate_configuration['es_version']) >= 7.0 and float(snap_rotate_configuration['es_version']) <= 7.16:
-					print("Snap-Rotate v3.1")
-					print("@2021 Tekium. All rights reserved.")
-					print("Author: Erick Rodriguez")
-					print("Email: erodriguez@tekium.mx, erickrr.tbd93@gmail.com")
-					print("License: GPLv3")
-					print("\nSnap-Rotate started...")
+					self.utils.createSnapRotateLog("Snap-Rotate v3.1", 1)
+					self.utils.createSnapRotateLog("@2022 Tekium. All rights reserved.", 1)
+					self.utils.createSnapRotateLog("Author: Erick Rodriguez", 1)
+					self.utils.createSnapRotateLog("Email: erodriguez@tekium.mx, erickrr.tbd93@gmail.com", 1)
+					self.utils.createSnapRotateLog("License: GPLv3", 1)
+					self.utils.createSnapRotateLog("Snap-Rotate started...", 1)
 					time_execution_rotate = snap_rotate_configuration['time_execution_rotate'].split(':')
 					while True:
 						now = datetime.now()
@@ -54,10 +54,10 @@ class Rotate:
 							month = months[now.month - 1]
 							name_repository = "Snap_Rotate_" + month + '_' + str(now.year)
 							conn_es = elastic.getConnectionElastic()
-							if now.day == 1:
+							is_exists_repository = elastic.getExistsRespositoryFS(conn_es, name_repository)
+							if is_exists_repository == False:
 								elastic.createRepositoryFS(conn_es, name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
 								self.utils.createSnapRotateLog("\nRepository created: " + name_repository, 1)
-								print("\nRepository created: " + name_repository)
 								message_creation_end_repository = telegram.getMessageEndCreationRepository(name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
 								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_end_repository)
 							list_all_indices = elastic.getIndicesElastic(conn_es)
@@ -68,7 +68,7 @@ class Rotate:
 									list_indices_not_writeables.append(index)
 							if not len(list_indices_not_writeables) == 0:
 								for index in list_indices_not_writeables:
-									print("\nSnapshot creation has started: " + index)
+									self.utils.createSnapRotateLog("Snapshot creation has started: " + index, 1)
 									message_creation_start_snapshot = telegram.getMessageStartCreationSnapshot(index, index, name_repository)
 									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_start_snapshot)
 									elastic.createSnapshot(conn_es, name_repository, index, index)
@@ -79,37 +79,34 @@ class Rotate:
 										sleep(60)
 									snapshot_info = elastic.getSnapshotInfo(conn_es, name_repository, index)
 									self.utils.createSnapRotateLog("Snapshot created: " + index, 1)
-									print("\nSnapshot created: " + index)
 									message_creation_end_snapshot = telegram.getMessageEndSnapshot(index, name_repository, snapshot_info['snapshots'][0]['start_time'], snapshot_info['snapshots'][0]['end_time'])
 									telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_end_snapshot)
 									if snap_rotate_configuration['is_delete_index'] == True:
 										elastic.deleteIndex(conn_es, index)
 										if not conn_es.indices.exists(index = index):
 											self.utils.createSnapRotateLog("Index removed: " + index, 1)
-											print("\nIndex removed: " + index)
 											message_delete_index = telegram.getMessageDeleteIndex(index)
 											telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_delete_index)
 								last_day_month = monthrange(now.year, now.month)[1]
 								if now.day == last_day_month:
 									if snap_rotate_configuration['is_compress_repository'] == True:
-										print("\nCompression of the repository has started...")
+										self.utils.createSnapRotateLog("Compression of the repository has started...", 1)
 										path_repository = snap_rotate_configuration['path_repositories'] + '/' + name_repository + '.tar.gz'
 										with open_tf(path_repository, "w:gz") as tar_file:
 											tar_file.add(snap_rotate_configuration['path_repositories'] + '/' + name_repository)
 										if path.exists(path_repository):
 											self.utils.createSnapRotateLog("The repository has been compressed: " + name_repository, 1)
-											print("\nThe repository has been compressed: " + name_repository)
 											message_compress_repository = telegram.getMessageCompressFile(name_repository, path_repository)
 											telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_compress_repository)
 							else:
-								print("\nThere are no indexes to store in the repository.")
+								self.utils.createSnapRotateLog("There are no indexes to store in the repository.", 1)
 							conn_es.transport.close()
 						sleep(60)
 				else:
-					print("\nElasticSearch version not supported.")
+					self.utils.createSnapRotateLog("ElasticSearch version not supported.", 2)
 			else:
-				print("\nConfiguration file not found.")
+				self.utils.createSnapRotateLog("Configuration file not found.", 2)
 		except KeyError as exception:
+			self.utils.createSnapRotateLog("Error during the execution of the application. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog("Key Error: " + str(exception), 3)
-			print("\nError during the execution of the application. For more information, see the logs.")
 			exit(1)

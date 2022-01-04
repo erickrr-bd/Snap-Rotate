@@ -1,7 +1,7 @@
 #! /bin/bash
 
 clear
-echo -e "\e[96m@2021 Tekium. All rights reserved.\e[0m"
+echo -e "\e[96m@2022 Tekium. All rights reserved.\e[0m"
 echo -e '\e[96mInstaller for Snap-Rotate v3.1\e[0m'
 echo -e '\e[96mAuthor: Erick Rodríguez\e[0m'
 echo -e '\e[96mEmail: erickrr.tbd93@gmail.com, erodriguez@tekium.mx\e[0m'

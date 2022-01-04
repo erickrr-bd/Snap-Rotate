@@ -96,12 +96,11 @@ class Elastic:
 											ssl_context = context)
 			if not conn_es == None:
 				self.utils.createSnapRotateLog("Established connection with: " + self.snap_rotate_configuration['es_host'] + ':' + str(self.snap_rotate_configuration['es_port']), 1)
-				print("\nCONNECTION DATA:\n")
-				print("Cluster name: " + conn_es.info()['cluster_name'])
-				print("Elasticsearch version: " + conn_es.info()['version']['number'])
+				self.utils.createSnapRotateLog("Cluster name: " + conn_es.info()['cluster_name'], 1)
+				self.utils.createSnapRotateLog("Elasticsearch version: " + conn_es.info()['version']['number'], 1)
 		except (KeyError, exceptions.ConnectionError, exceptions.AuthenticationException, exceptions.AuthorizationException, InvalidURL) as exception:
+			self.utils.createSnapRotateLog("Failed to connect to ElasticSearch. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to connect to ElasticSearch. For more information, see the logs.")
 			exit(1)
 		else:
 			return conn_es
@@ -147,8 +146,8 @@ class Elastic:
 		try:
 			conn_es.snapshot.create(repository = repository_name, snapshot = snapshot_name, body = { "indices" : indices, "include_global_state" : False }, wait_for_completion = False)
 		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+			self.utils.createSnapRotateLog("Failed to create snapshot. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to create snapshot. For more information, see the logs.")
 			exit(1)
 
 	"""
@@ -168,8 +167,9 @@ class Elastic:
 		try:
 			conn_es.indices.delete(index = index_name)
 		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+			self.utils.createSnapRotateLog("Failed to delete index. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to delete index. For more information, see the logs.")
+			exit(1)
 
 	"""
 	Method that gets all the names of the allowed indexes.
@@ -192,8 +192,9 @@ class Elastic:
 			list_all_indices = conn_es.indices.get(index = '*')
 			list_all_indices = sorted([index for index in list_all_indices if not index.startswith('.')])
 		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+			self.utils.createSnapRotateLog("Error getting the indices. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nError getting the indices. For more information, see the logs.")
+			exit(1)
 		else:
 			return list_all_indices
 			
@@ -211,7 +212,7 @@ class Elastic:
 	Exceptions:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
-	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES. 
+	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES.
 	"""
 	def getIsWriteableIndex(self, conn_es, index_name):
 		try:
@@ -220,10 +221,35 @@ class Elastic:
 			for aux in aux_var:
 				is_writeable_index = info[index_name]['aliases'][aux]['is_write_index']
 		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+			self.utils.createSnapRotateLog("Error getting index information. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nError getting index information. For more information, see the logs.")
+			exit(1)
 		else:
 			return is_writeable_index
+
+	"""
+	Method that gets if the repository exists or not.
+
+	Parameters:
+	self -- An instantiated object of the Elastic class.
+	conn_es -- Object that contains the connection to ElasticSearch.
+	repository_name -- Name of the repository to check whether it exists or not.
+
+	Return:
+	Whether or not the repository exists.
+
+	Exceptions:
+	exceptions.NotFoundError -- Exception representing a 404 status code.
+	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES.
+	"""
+	def getExistsRespositoryFS(self,conn_es, repository_name):
+		try:
+			conn_es.snapshot.verify_repository(repository = repository_name)
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError) as exception:
+			return False
+		else:
+			return True
 
 	"""
 	Method that obtains the current status of a snapshot.
@@ -246,8 +272,9 @@ class Elastic:
 			info_snapshot = conn_es.snapshot.status(repository = repository_name, snapshot = snapshot_name)
 			status_snapshot = info_snapshot['snapshots'][0]['state']
 		except (exceptions.NotFoundError, exceptions.ConnectionError) as exception:
+			self.utils.createSnapRotateLog("Failed to get snapshot status. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to create snapshot. For more information, see the logs.")
+			exit(1)
 		else:
 			return status_snapshot
 
@@ -271,7 +298,8 @@ class Elastic:
 		try:
 			snapshot_info = conn_es.snapshot.get(repository = repository_name, snapshot = snapshot_name)
 		except (exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+			self.utils.createSnapRotateLog("Failed to get snapshot status. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nFailed to get snapshot status. For more information, see the logs.")
+			exit(1)
 		else:
 			return snapshot_info
