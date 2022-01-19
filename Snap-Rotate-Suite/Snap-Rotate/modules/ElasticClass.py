@@ -1,5 +1,5 @@
-from sys import exit
 from datetime import datetime
+from sys import exit, warnoptions
 from modules.UtilsClass import Utils
 from ssl import create_default_context
 from requests.exceptions import InvalidURL
@@ -9,6 +9,13 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection, exceptions
 Class that manages everything related to ElasticSearch.
 """
 class Elastic:
+	"""
+	Disable warning message.
+	"""
+	if not warnoptions:
+		from warnings import simplefilter
+		simplefilter("ignore")
+
 	"""
 	Property that stores an object of the Utils class.
 	"""
@@ -44,6 +51,7 @@ class Elastic:
 	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES. 
 	exceptions.AuthenticationException -- Exception representing a 401 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	InvalidURL -- The URL provided was somehow invalid.
 	"""
 	def getConnectionElastic(self):
@@ -98,7 +106,7 @@ class Elastic:
 				self.utils.createSnapRotateLog("Established connection with: " + self.snap_rotate_configuration['es_host'] + ':' + str(self.snap_rotate_configuration['es_port']), 1)
 				self.utils.createSnapRotateLog("Cluster name: " + conn_es.info()['cluster_name'], 1)
 				self.utils.createSnapRotateLog("Elasticsearch version: " + conn_es.info()['version']['number'], 1)
-		except (KeyError, exceptions.ConnectionError, exceptions.AuthenticationException, exceptions.AuthorizationException, InvalidURL) as exception:
+		except (KeyError, exceptions.ConnectionError, exceptions.AuthenticationException, exceptions.AuthorizationException, InvalidURL, exceptions.TransportError) as exception:
 			self.utils.createSnapRotateLog("Failed to connect to ElasticSearch. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)
@@ -117,13 +125,14 @@ class Elastic:
 	Exceptions:
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES. 
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def createRepositoryFS(self, conn_es, repository_name, path_repository):
 		try:
 			conn_es.snapshot.create_repository(repository = repository_name, body = { "type": "fs", "settings": { "location": path_repository, "compress" : True }})
-		except (exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+		except (exceptions.AuthorizationException, exceptions.ConnectionError, exceptions.TransportError) as exception:
+			self.utils.createSnapRotateLog("Error creating repository. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
-			print("\nError creating repository. For more information, see the logs.")
 			exit(1)
 
 	"""
@@ -141,11 +150,12 @@ class Elastic:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def createSnapshot(self, conn_es, repository_name, snapshot_name, indices):
 		try:
 			conn_es.snapshot.create(repository = repository_name, snapshot = snapshot_name, body = { "indices" : indices, "include_global_state" : False }, wait_for_completion = False)
-		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+		except (exceptions.RequestError, exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError, exceptions.TransportError) as exception:
 			self.utils.createSnapRotateLog("Failed to create snapshot. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)
@@ -162,11 +172,12 @@ class Elastic:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES. 
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def deleteIndex(self, conn_es, index_name):
 		try:
 			conn_es.indices.delete(index = index_name)
-		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError, exceptions.TransportError)  as exception:
 			self.utils.createSnapRotateLog("Failed to delete index. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)
@@ -185,13 +196,14 @@ class Elastic:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def getIndicesElastic(self, conn_es):
 		try:
 			list_all_indices = []
 			list_all_indices = conn_es.indices.get(index = '*')
 			list_all_indices = sorted([index for index in list_all_indices if not index.startswith('.')])
-		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError, exceptions.TransportError)  as exception:
 			self.utils.createSnapRotateLog("Error getting the indices. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)
@@ -213,14 +225,16 @@ class Elastic:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def getIsWriteableIndex(self, conn_es, index_name):
 		try:
+			is_writeable_index = None
 			info = conn_es.indices.get(index = index_name)
 			aux_var = info[index_name]['aliases']
 			for aux in aux_var:
 				is_writeable_index = info[index_name]['aliases'][aux]['is_write_index']
-		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError)  as exception:
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError, exceptions.TransportError)  as exception:
 			self.utils.createSnapRotateLog("Error getting index information. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)
@@ -242,11 +256,12 @@ class Elastic:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError -- Error raised when there was an exception while talking to ES.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def getExistsRespositoryFS(self,conn_es, repository_name):
 		try:
 			conn_es.snapshot.verify_repository(repository = repository_name)
-		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError) as exception:
+		except (exceptions.AuthorizationException, exceptions.NotFoundError, exceptions.ConnectionError, exceptions.TransportError) as exception:
 			return False
 		else:
 			return True
@@ -266,12 +281,13 @@ class Elastic:
 	Exceptions:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def getStatusSnapshot(self, conn_es, repository_name, snapshot_name):
 		try:
 			info_snapshot = conn_es.snapshot.status(repository = repository_name, snapshot = snapshot_name)
 			status_snapshot = info_snapshot['snapshots'][0]['state']
-		except (exceptions.NotFoundError, exceptions.ConnectionError) as exception:
+		except (exceptions.NotFoundError, exceptions.ConnectionError, exceptions.TransportError) as exception:
 			self.utils.createSnapRotateLog("Failed to get snapshot status. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)
@@ -293,11 +309,12 @@ class Elastic:
 	exceptions.NotFoundError -- Exception representing a 404 status code.
 	exceptions.AuthorizationException -- Exception representing a 403 status code.
 	exceptions.ConnectionError --  Error raised when there was an exception while talking to ES.
+	exceptions.TransportError -- Exception raised when ES returns a non-OK (>=400) HTTP status code. Or when an actual connection error happens; in that case the status_code will be set to 'N/A'.
 	"""
 	def getSnapshotInfo(self, conn_es, repository_name, snapshot_name):
 		try:
 			snapshot_info = conn_es.snapshot.get(repository = repository_name, snapshot = snapshot_name)
-		except (exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError) as exception:
+		except (exceptions.NotFoundError, exceptions.AuthorizationException, exceptions.ConnectionError, exceptions.TransportError) as exception:
 			self.utils.createSnapRotateLog("Failed to get snapshot status. For more information, see the logs.", 3)
 			self.utils.createSnapRotateLog(exception, 3)
 			exit(1)

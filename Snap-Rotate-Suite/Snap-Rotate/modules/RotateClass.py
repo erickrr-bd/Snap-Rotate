@@ -60,6 +60,8 @@ class Rotate:
 								self.utils.createSnapRotateLog("Repository created: " + name_repository, 1)
 								message_creation_end_repository = telegram.getMessageEndCreationRepository(name_repository, snap_rotate_configuration['path_repositories'] + '/' + name_repository)
 								telegram.sendTelegramAlert(self.utils.decryptAES(snap_rotate_configuration['telegram_chat_id']).decode('utf-8'), self.utils.decryptAES(snap_rotate_configuration['telegram_bot_token']).decode('utf-8'), message_creation_end_repository)
+							else:
+								self.utils.createSnapRotateLog("The repository already exists.", 1)
 							list_all_indices = elastic.getIndicesElastic(conn_es)
 							list_indices_not_writeables = []
 							for index in list_all_indices:
@@ -90,7 +92,7 @@ class Rotate:
 								last_day_month = monthrange(now.year, now.month)[1]
 								if now.day == last_day_month:
 									if snap_rotate_configuration['is_compress_repository'] == True:
-										self.utils.createSnapRotateLog("Compression of the repository has started...", 1)
+										self.utils.createSnapRotateLog("Compression of the repository has started.", 1)
 										path_repository = snap_rotate_configuration['path_repositories'] + '/' + name_repository + '.tar.gz'
 										with open_tf(path_repository, "w:gz") as tar_file:
 											tar_file.add(snap_rotate_configuration['path_repositories'] + '/' + name_repository)
